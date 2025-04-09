@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+@import "tailwindcss";
+@theme {
+  --font-lexend: "Lexend Deca", sans-serif;
+  --font-roboto: "Roboto Mono", monospace;
+  --color-base-primary: #323437;
+  --color-base-secondary: #424242;
+  --color-content-primary: #d1d0c5;
+  --color-content-secondary: #646669;
+  --color-content-main : #e2b714;
+  --breakpoint-xs :560px;
+  --breakpoint-sm: 720px;
+  --breakpoint-md: 848px;
+  --breakpoint-lg: 1104px;
+  --breakpoint-xl: 1360px;
+  --breakpoint-2xl: 1616px;
+}
