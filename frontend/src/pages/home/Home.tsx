@@ -9,34 +9,55 @@ import { PiWrenchFill } from "react-icons/pi";
 import { FaTools } from "react-icons/fa";
 import { GrRefresh } from "react-icons/gr";
 import { generate } from "random-words";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { FaEarthAmericas } from "react-icons/fa6";
 import { GiArrowCursor } from "react-icons/gi";
 
 const Home = () => {
-  const [lastCorrectWordIndex, setLastCorrectWordIndex] = useState<number>(0);
-  const [fixedWords, setFixedWords] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [userInput, setUserInput] = useState<string[]>([]);
   const [words, setWords] = useState<string[]>(
     Array.from(generate({ min: 50, max: 200 }))
-  );
+  ); // array of random words
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]); // array of all span elements
+  const inputRef = useRef<HTMLInputElement | null>(null); // inputRef
+
+  const caretRef = useRef<HTMLDivElement | null>(null);
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value; // current value
+    const lastCharTyped = value.charAt(value.length - 1); // last character typed
+    let currCharIndex = value.length; // current character index
+    const activeSpan = charRefs.current[currCharIndex - 1]; // expected active span
+
+    if (!activeSpan) return; // if there's no active span return
+
+    const expectedChar = activeSpan?.textContent; // expected character
+
+    if (caretRef.current) {
+      const coordsOfActiveSpan = activeSpan.getBoundingClientRect();
+      caretRef.current.style.top = coordsOfActiveSpan.y + 4+ "px";
+       
+      caretRef.current.style.left = coordsOfActiveSpan.x+15 + "px";
+    }
+    if (lastCharTyped === expectedChar) {
+      activeSpan.classList.add("text-content-primary");
+      currCharIndex++;
+    } else {
+      activeSpan.textContent = lastCharTyped;
+      activeSpan.classList.add("text-red-500");
+    }
+  };
 
   useEffect(() => {
-    userInput.slice(fixedWords.length).forEach((word, index) => {
-      if (words[fixedWords.length + index] === word) {
-        setLastCorrectWordIndex(fixedWords.length + index);
-        setFixedWords([...userInput.slice(0, fixedWords.length + index + 1), " "]);
-      }
-      
-    });
-  }, [userInput]);
+    if (isFocused) {
+      inputRef.current?.focus();
+    }
+  }, [isFocused, words]);
 
   return (
     <main className="flex-1 flex flex-col gap-10">
       <div className="mt-6 text-config flex items-center justify-center mx-auto px-4 bg-[rgba(0,0,0,.13)] w-fit rounded-lg text-content-secondary  leading-4">
         {/* small screen */}
-        <div className="sm:hidden py-2.5 px-2 flex items-center justify-center  gap-4 mx-auto hover:text-content-primary duration-200 ease-outry">
+        <div className="sm:hidden py-2.5 px-2 flex items-center justify-center  gap-4 mx-auto hover:text-content-primary duration-200 ease-out">
           <IoSettingsSharp />
           <div className="font-semibold tracking-wide font-roboto text-sm">
             Test settings
@@ -103,40 +124,34 @@ const Home = () => {
           <FaEarthAmericas className="text-lg" />
           english
         </div>
-        <label
-          htmlFor="user-input"
-          className={`relative font-roboto whitespace-wrap`}
+        <div
+          className={`relative font-roboto`}
+          tabIndex={0}
           onFocus={() => setIsFocused(true)}
-          onBlurCapture={() => setIsFocused(false)}
         >
-          <input
-            id="user-input"
-            type="text"
-            className="opacity-0 z-[-10]"
-            onChange={(e) => {
-              setUserInput(e.currentTarget.value.split(" "));
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Backspace") {
-                if (fixedWords.join(" ") === userInput.join(" ")) {
-                  e.preventDefault();
-                }
-              }
-            }}
-          />
           <div
-            className={`flex flex-wrap gap-5 h-[150px] overflow-hidden leading-[30px] ${
-              !isFocused ? "blur-[7px]" : ""
+            className={`h-[145px] overflow-hidden ${
+              !isFocused ? "blur-[10px]" : ""
             } [text-align-last:center] text-justify select-none text-[30px]`}
-            tabIndex={0}
           >
-            {words.map((word, index) => (
-              <div key={word + index}>{word}</div>
-            ))}
+            {words
+              .join(" ")
+              .split("")
+              .map((char, index) => (
+                <span
+                  className={`leading-[50px]`}
+                  key={index}
+                  ref={(e) => {
+                    charRefs.current[index] = e;
+                  }}
+                >
+                  {char}
+                </span>
+              ))}
           </div>
           {!isFocused && (
             <div
-              className="absolute cursor-default top-1/3 left-1/2 -translate-x-1/2  text-base items-center justify-center flex gap-1 text-content-primary"
+              className="absolute cursor-default top-1/3 left-1/2 -translate-x-1/2 text-base flex items-center justify-center gap-1 text-content-primary"
               onClick={() => {
                 setIsFocused(true);
               }}
@@ -145,7 +160,7 @@ const Home = () => {
               Click here or press any where to focus
             </div>
           )}
-        </label>
+        </div>
 
         <button
           onClick={(e) => {
@@ -160,6 +175,19 @@ const Home = () => {
           <GrRefresh />
         </button>
       </div>
+      <input
+        onBlur={() => setIsFocused(false)}
+        type="text"
+        id="typing-input"
+        className="size-0"
+        autoComplete="off"
+        ref={inputRef}
+        onChange={handleInputChange}
+      />
+      <div
+        ref={caretRef}
+        className={`duration-75 bg-content-main absolute h-8 w-1 rounded-full`}
+      />
     </main>
   );
 };
