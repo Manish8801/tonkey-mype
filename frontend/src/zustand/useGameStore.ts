@@ -28,7 +28,15 @@ const useGameStore = create<TStore>()((set, get) => ({
   option: 30,
   words: Array.from(generate({ exactly: 30 })),
   setResult: (result) => set({ result }),
-  setOption: (option) => set({ option }),
+  setOption: (option) => {
+    const { mode, genWords, setTimer } = get();
+    if (mode === "words") genWords();
+    if (mode === "time") {
+      setTimer(option);
+      genWords();
+      }
+      set({option});
+  },
   setMode: (mode) => set({ mode }),
   setTimer: (timer) => set({ timer }),
   genWords: () => {

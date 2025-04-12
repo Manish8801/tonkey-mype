@@ -13,6 +13,11 @@ import { type ChangeEvent } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 import { calcAccuracy, calcErrors, calcWPM } from "../../../utils/game.utils";
 
+function getOffsets(elem: HTMLElement) {
+  const x = Math.round(elem.offsetLeft);
+  const y = Math.round(elem.offsetTop);
+  return { x, y };
+}
 function resetStyle(elem: HTMLElement) {
   elem.style.color = "";
   elem.style.borderBottomColor = "transparent";
@@ -51,6 +56,7 @@ const TypingInput = () => {
     setOption,
     setMode,
   } = useGameStore();
+  const lastCorrectIndex = useRef<number>(0);
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const caretRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -60,30 +66,34 @@ const TypingInput = () => {
   const firstLineYCoord = useRef<number>(0);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length >= paragraphRef.current!.children.length + 1) {
+    const valueLength = e.target.value.length;
+    if (valueLength >= paragraphRef.current!.children.length + 1) {
       e.preventDefault();
       e.target.value = value.current;
       return;
     }
 
     value.current = e.target.value;
-    const valueLength = value.current.length;
 
     if (valueLength === 0) {
-      const { x, y } = getCoords(charRefs.current[0]!);
+      const { x, y } = getOffsets(charRefs.current[0]!);
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
       resetStyle(charRefs.current[0]!);
-      return;
     }
     const lastCharTyped = value.current[valueLength - 1];
+
     if (lastCharTyped === charRefs.current[valueLength - 1]?.textContent) {
       styleCorrect(charRefs.current[valueLength - 1]!);
+      if (charRefs.current[valueLength - 1]?.textContent !== " ") {
+        lastCorrectIndex.current = valueLength;
+      }
     } else {
       styleWrong(charRefs.current[valueLength - 1]!);
     }
 
     if (valueLength === 0) {
       resetStyle(charRefs.current[0]!);
+      lastCorrectIndex.current = valueLength;
     } else {
       resetStyle(charRefs.current[valueLength]!);
     }
@@ -91,7 +101,7 @@ const TypingInput = () => {
     if (charRefs.current[valueLength]) {
       const currSpan = charRefs.current[valueLength];
       if (
-        getCoords(currSpan).y - firstLineYCoord.current >=
+        getOffsets(currSpan).y - firstLineYCoord.current >=
         currSpan.offsetHeight * 2
       ) {
         if (paragraphRef.current) {
@@ -105,7 +115,7 @@ const TypingInput = () => {
           firstLineYCoord.current = getCoords(paragraphRef.current).y;
         }
       }
-      const { x, y } = getCoords(charRefs.current[valueLength]);
+      const { x, y } = getOffsets(charRefs.current[valueLength]);
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
     }
   };
@@ -114,15 +124,6 @@ const TypingInput = () => {
     inputRef.current?.focus();
   }, [isFocused]);
 
-  useEffect(() => {
-    if (option) {
-      if (mode === "words") genWords();
-      if (mode === "time") {
-        setTimer(option);
-        genWords();
-      }
-    }
-  }, [mode, option]);
   useEffect(() => {
     if (inputRef.current) inputRef.current.value = "";
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
@@ -171,7 +172,7 @@ const TypingInput = () => {
   useEffect(() => {
     const defaultSpan = charRefs.current[0];
     if (!defaultSpan) return;
-    const { x, y } = getCoords(defaultSpan);
+    const { x, y } = getOffsets(defaultSpan);
     firstLineYCoord.current = y;
     if (caretRef.current) placeCaret(caretRef.current, { x, y });
   }, [isFocused, mode, words]);
@@ -281,12 +282,10 @@ const TypingInput = () => {
         <div
           className={`relative font-roboto`}
           tabIndex={0}
-          onFocus={() => {
-            if (!isFocused) setIsFocused(true);
-          }}
+          onFocus={() => setIsFocused(true)}
         >
           <div
-            className={`h-[145px] overflow-hidden ${
+            className={`relative h-[145px] overflow-y-hidden ${
               !isFocused ? "blur-[10px]" : ""
             } ] text-left select-none scroll-smooth`}
             ref={paragraphRef}
@@ -308,13 +307,17 @@ const TypingInput = () => {
                   {char}
                 </span>
               ))}
+            <div
+              ref={caretRef}
+              className={`${
+                isFocused ? "block" : "hidden"
+              } duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
+            />
           </div>
           {!isFocused && (
             <div
-              className="absolute cursor-default top-1/3 left-1/2 -translate-x-1/2 text-base flex items-center justify-center gap-1 text-content-primary"
-              onClick={() => {
-                if (!isFocused) setIsFocused(true);
-              }}
+              className="select-none absolute cursor-default top-1/3 left-1/2 -translate-x-1/2 text-base flex items-center justify-center gap-1 text-content-primary"
+              onClick={() => setIsFocused(true)}
             >
               <GiArrowCursor />
               Click here or press any where to focus
@@ -325,7 +328,7 @@ const TypingInput = () => {
         <button
           onClick={(e) => {
             genWords();
-            if (!isFocused) setIsFocused(true);
+            setIsFocused(true);
 
             const prevRotation = parseInt(e.currentTarget.style.rotate);
             e.currentTarget.style.rotate = (prevRotation || 0) + 360 + "deg";
@@ -346,19 +349,20 @@ const TypingInput = () => {
         ref={inputRef}
         onChange={handleInputChange}
         onKeyDown={(e) => {
-          if (e.key === "Control") {
+          if (
+            ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+          ) {
             e.preventDefault();
-
             return;
-            console.log(e.key);
+          }
+          if (
+            e.key === "Backspace" &&
+            lastCorrectIndex.current === value.current.length
+          ) {
+            e.preventDefault();
+            return;
           }
         }}
-      />
-      <div
-        ref={caretRef}
-        className={`${
-          isFocused ? "block" : "hidden"
-        } duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
       />
     </main>
   );
