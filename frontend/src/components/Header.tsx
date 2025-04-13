@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
-import { FaKeyboard } from "react-icons/fa";
-import { FaCrown } from "react-icons/fa";
-import { IoSettingsSharp } from "react-icons/io5";
-import { FaBell } from "react-icons/fa";
-import { IoPersonSharp } from "react-icons/io5";
 import useAuthStore from "../zustand/useAuthStore";
+import { FaBell, FaCrown, FaKeyboard } from "react-icons/fa6";
+import { IoPersonSharp, IoSettingsSharp } from 'react-icons/io5';
 
 const Header = () => {
   const { user } = useAuthStore();
@@ -18,10 +15,10 @@ const Header = () => {
           className="min-w-8 size-8 md:size-10"
         />
         <p className="absolute hidden md:block -top-2 left-12  font-semibold text-content-secondary text-xs">
-          monkey see
+          tonkey see
         </p>
         <h1 className="hidden md:block text-2xl lg:text-[2rem] leading-8  text-content-primary font-lexend">
-          monkeytype
+          tonkeymype
         </h1>
       </Link>
 

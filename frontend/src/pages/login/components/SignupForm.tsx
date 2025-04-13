@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { FaUser } from "react-icons/fa";
 import { ISignupData } from "../../../types/type";
 import type { FormEvent } from "react";
-import { ImCross } from "react-icons/im";
-import { FaCheck } from "react-icons/fa";
 import useAuthStore from "../../../zustand/useAuthStore";
 import RiseLoader from "react-spinners/esm/RiseLoader";
+import { FaCheck, FaUser } from "react-icons/fa";
+import { ImCross } from 'react-icons/im';
 
 const initialState: ISignupData = {
   username: "",

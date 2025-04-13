@@ -1,52 +1,59 @@
-import { generate } from "random-words";
 import { create } from "zustand";
+import { genMatter } from "../utils/game.utils";
+import type { IGenConfigs, IResult } from "../types/type";
 
-type TResult = {
-  wpm: number;
-  accuracy: number;
-  raw: number;
-  time: number;
-  errors: Record<string, number[]>;
-} | null;
 type TStore = {
-  timer: number;
-  result: TResult;
+  isFocused: boolean;
+  cases: boolean;
+  matter: string;
   mode: "words" | "time";
-  option: number;
-  words: string[];
-  setResult: (result: TResult) => void;
-  setTimer: (timer: number) => void;
-  setOption: (option: number) => void;
-  genWords: () => void;
-  setMode: (mode: "words" | "time") => void;
+  number: boolean;
+  punctuation: boolean;
+  result: IResult | null;
+  time: number;
+  totalWords: number;
+  isGameOver: boolean;
+  toggleIsGameOver: () => void;
+  toggleIsFocused: () => void;
+  genMatter: () => void;
+  toggleMode: () => void;
+  toggleCases: () => void;
+  toggleNumber: () => void;
+  togglePunctuation: () => void;
+  setTime: (time: number) => void;
+  setTotalWords: (totalWords: number) => void;
+  setResult: (result: IResult | null) => void;
 };
 
 const useGameStore = create<TStore>()((set, get) => ({
-  timer: 30,
+  isFocused: false,
+  cases: false,
+  matter: "",
+  mode: "time",
+  number: false,
+  punctuation: false,
   result: null,
-  mode: "words",
-  option: 30,
-  words: Array.from(generate({ exactly: 30 })),
+  time: 15,
+  totalWords: 20,
+  isGameOver: false,
+  toggleIsGameOver: () => set({ isGameOver: !get().isGameOver }),
+  toggleIsFocused: () => set({ isFocused: !get().isFocused }),
+  setTime: (time) => set({ time }),
   setResult: (result) => set({ result }),
-  setOption: (option) => {
-    const { mode, genWords, setTimer } = get();
-    if (mode === "words") genWords();
-    if (mode === "time") {
-      setTimer(option);
-      genWords();
-      }
-      set({option});
-  },
-  setMode: (mode) => set({ mode }),
-  setTimer: (timer) => set({ timer }),
-  genWords: () => {
-    const { mode, option } = get();
-    if (mode === "words")
-      set({ words: Array.from(generate({ exactly: option })) });
-    if (mode === "time")
-      set({
-        words: Array.from(generate({ min: 5 * option, max: 5 * option + 20 })),
-      });
+  toggleCases: () => set({ cases: !get().cases }),
+  toggleNumber: () => set({ number: !get().number }),
+  setTotalWords: (totalWords) => set({ totalWords }),
+  togglePunctuation: () => set({ punctuation: !get().punctuation }),
+  toggleMode: () => set({ mode: get().mode === "words" ? "time" : "words" }),
+  genMatter: () => {
+    const { number, punctuation, cases, mode, time, totalWords } = get();
+
+    const configs: IGenConfigs = { number, punctuation, cases };
+
+    if (mode === "words") configs.exactly = totalWords;
+    else configs.min = time * 5;
+
+    set({ matter: genMatter(configs) });
   },
 }));
 

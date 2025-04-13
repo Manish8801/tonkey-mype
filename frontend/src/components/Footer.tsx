@@ -1,15 +1,9 @@
-import { MdMail } from "react-icons/md";
-import { FaDonate } from "react-icons/fa";
-import { FaDiscord } from "react-icons/fa";
+import { FaCodeBranch, FaDiscord, FaDonate, FaLock, FaPalette, FaShieldAlt } from "react-icons/fa";
 import { FaSheetPlastic } from "react-icons/fa6";
-import { FaShieldAlt } from "react-icons/fa";
-import { FaLock } from "react-icons/fa";
-import { FaPalette } from "react-icons/fa6";
-import { FaCodeBranch } from "react-icons/fa";
-
+import { MdMail } from "react-icons/md";
 const Footer = () => {
   return (
-    <div className="mt-20 flex flex-col gap-3 items-center  tracking-wide text-content-secondary">
+    <div className=" flex flex-col gap-3 items-center  tracking-wide text-content-secondary">
       {/* first part */}
       <div className="flex gap-3 items-center  leading-4 text-xs font-roboto ">
         <span className="px-2 py-0.5 bg-content-secondary rounded-xs text-base-primary">

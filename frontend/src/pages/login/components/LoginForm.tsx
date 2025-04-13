@@ -1,11 +1,9 @@
-import { IoLogInSharp } from "react-icons/io5";
-import { FaGoogle } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa";
-import { FaCheck } from "react-icons/fa";
 import { FormEvent, useState } from "react";
 import { ILoginData } from "../../../types/type";
 import useAuthStore from "../../../zustand/useAuthStore";
 import RiseLoader from "./../../../../node_modules/react-spinners/esm/RiseLoader";
+import { IoLogInSharp } from "react-icons/io5";
+import { FaCheck, FaGithub, FaGoogle } from "react-icons/fa";
 
 const initialLoginData = {
   usernameOrEmail: "",

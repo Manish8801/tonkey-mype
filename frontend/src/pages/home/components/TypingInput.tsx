@@ -1,69 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-import { IoSettingsSharp } from "react-icons/io5";
-import { FaAt } from "react-icons/fa";
-import { FaHashtag } from "react-icons/fa6";
-import { FaClock } from "react-icons/fa";
-import { FaFont } from "react-icons/fa";
-import { FaQuoteLeft } from "react-icons/fa";
-import { FaTools } from "react-icons/fa";
-import { GrRefresh } from "react-icons/gr";
-import { FaEarthAmericas } from "react-icons/fa6";
-import { GiArrowCursor } from "react-icons/gi";
-import { type ChangeEvent } from "react";
 import useGameStore from "../../../zustand/useGameStore";
-import { calcAccuracy, calcErrors, calcWPM } from "../../../utils/game.utils";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import Timer from "./Timer";
+import { getOffsets, placeCaret, resetStyle, styleCorrect, styleWrong } from "../../../utils/game.utils";
+import {FaEarthAmericas} from "react-icons/fa6";
+import { GiArrowCursor } from 'react-icons/gi';
+import { GrRefresh } from 'react-icons/gr';
 
-function getOffsets(elem: HTMLElement) {
-  const x = Math.round(elem.offsetLeft);
-  const y = Math.round(elem.offsetTop);
-  return { x, y };
-}
-function resetStyle(elem: HTMLElement) {
-  elem.style.color = "";
-  elem.style.borderBottomColor = "transparent";
-}
-function getCoords(elem: HTMLElement) {
-  const { x, y } = elem.getBoundingClientRect();
-  return { x: Math.round(x), y: Math.round(y) };
-}
-function placeCaret(
-  caretElem: HTMLDivElement,
-  { x, y }: { x: number; y: number }
-) {
-  if (caretElem) {
-    caretElem.style.left = x - 2 + "px";
-    caretElem.style.top = y + "px";
-  }
-}
-function styleWrong(elem: HTMLElement) {
-  if (elem) {
-    elem.style.color = "#7e2a33";
-    elem.style.borderBottomColor = "#7e2a33";
-  }
-}
-function styleCorrect(elem: HTMLElement) {
-  if (elem) elem.style.color = "#d1d0c5";
-}
+
 const TypingInput = () => {
-  const {
-    mode,
-    option,
-    timer,
-    words,
-    setResult,
-    setTimer,
-    genWords,
-    setOption,
-    setMode,
-  } = useGameStore();
-  const lastCorrectIndex = useRef<number>(0);
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const {  time, matter, setResult, genMatter, isFocused, toggleIsFocused } = useGameStore();
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const paragraphRef = useRef<HTMLDivElement | null>(null);
   const caretRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const paragraphRef = useRef<HTMLDivElement | null>(null);
+  const lastCorrectIndex = useRef<number>(0);
   const value = useRef<string>("");
-  const charRefs = useRef<(HTMLSpanElement | null)[]>([]); // each span contains each char
-  const firstLineYCoord = useRef<number>(0);
+  const yCoordFirstLine = useRef<number>(0);
+  const [timer, setTimer] = useState<number>(time);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
@@ -101,18 +54,18 @@ const TypingInput = () => {
     if (charRefs.current[valueLength]) {
       const currSpan = charRefs.current[valueLength];
       if (
-        getOffsets(currSpan).y - firstLineYCoord.current >=
+        getOffsets(currSpan).y - yCoordFirstLine.current >=
         currSpan.offsetHeight * 2
       ) {
         if (paragraphRef.current) {
           paragraphRef.current.scrollBy(0, 50);
-          firstLineYCoord.current = getCoords(paragraphRef.current).y;
+          yCoordFirstLine.current += 50;
         }
-      } else if (getCoords(currSpan).y < firstLineYCoord.current) {
+      } else if (getOffsets(currSpan).y < yCoordFirstLine.current) {
         if (paragraphRef.current) {
           paragraphRef.current.scrollBy(0, -50);
 
-          firstLineYCoord.current = getCoords(paragraphRef.current).y;
+          yCoordFirstLine.current -= 50;
         }
       }
       const { x, y } = getOffsets(charRefs.current[valueLength]);
@@ -121,7 +74,7 @@ const TypingInput = () => {
   };
 
   useEffect(() => {
-    inputRef.current?.focus();
+    if (isFocused) inputRef.current?.focus();
   }, [isFocused]);
 
   useEffect(() => {
@@ -131,167 +84,47 @@ const TypingInput = () => {
     charRefs.current.forEach((span) => {
       if (span) resetStyle(span);
     });
-    setResult(null);
-  }, [words]);
 
-  useEffect(() => {
-    if (isFocused && option) {
-      if (mode === "time") {
-        if (timer === 0) {
-          if (words) {
-            setResult({
-              wpm: calcWPM(option, value.current),
-              accuracy: calcAccuracy(
-                words.join(" ").split("").join(""),
-                value.current.trim()
-              ),
-              raw: value.current.trim().length,
-              time: option,
-              errors: calcErrors(
-                words.join(" ").split("").join(""),
-                value.current.trim()
-              ),
-            });
-          }
-        }
-      }
-      if (timer > 0) {
-        {
-          const interval = setInterval(() => {
-            setTimer(timer - 1);
-          }, 999);
-
-          return () => {
-            clearInterval(interval);
-          };
-        }
-      }
-    }
-  }, [isFocused, mode, option, timer]);
-
-  useEffect(() => {
     const defaultSpan = charRefs.current[0];
     if (!defaultSpan) return;
     const { x, y } = getOffsets(defaultSpan);
-    firstLineYCoord.current = y;
+    yCoordFirstLine.current = y;
     if (caretRef.current) placeCaret(caretRef.current, { x, y });
-  }, [isFocused, mode, words]);
+
+    setResult(null);
+  }, [matter, setResult]);
+
+
+  useEffect(() => {
+    if (isFocused) {
+      const interval = setInterval(() => {
+        if (time > 0) setTimer(timer - 1);
+      }, 999);
+      return () => clearInterval(interval);
+    }
+  }, [isFocused, time]);
 
   return (
-    <main className="flex-1 flex flex-col gap-10">
-      <div className="mt-6 text-config flex items-center justify-center mx-auto px-4 bg-[rgba(0,0,0,.13)] w-fit rounded-lg text-content-secondary  leading-4">
-        {/* small screen */}
-        <div className="sm:hidden py-2.5 px-2 flex items-center justify-center  gap-4 mx-auto hover:text-content-primary text-[.65rem] duration-200 ease-out">
-          <IoSettingsSharp />
-          <div className="font-semibold tracking-wide font-roboto text-sm">
-            Test settings
-          </div>
-        </div>
-
-        {/* medium screen */}
-        <div className="hidden sm:flex max-w-full sm:text-[0.7rem] md:text-[0.75rem] lg:text-[0.8rem] items-center justify-between sm:gap-1.5 md:gap-2 lg:gap-2.5 ">
-          <button className="gap-0.5 py-2.5 flex  justify-center hover:text-content-primary duration-200 ease-out">
-            <FaAt className="sm:text-sm md:text-base" />
-            <div className="font-semibold pb-1">punctuation</div>
-          </button>
-          <button className="gap-0.5 py-2.5 flex  justify-center hover:text-content-primary duration-200 ease-out">
-            <FaHashtag className="sm:text-sm md:text-base" />
-            <div className="font-semibold pb-1">numbers</div>
-          </button>
-          <div
-            className="h-7 rounded-full sm:w-[2px] md:w-[3px] lg:w-[4px] bg-base-primary"
-            aria-hidden={true}
-          />
-          <button
-            className={`py-2.5 flex items-center justify-center gap-0.5 ${
-              mode === "time"
-                ? "text-content-main"
-                : "hover:text-content-primary"
-            } duration-200 ease-out`}
-            onClick={() => setMode("time")}
-          >
-            <FaClock className="sm:text-sm md:text-base" />
-            <div className="font-semibold">time</div>
-          </button>
-          <button
-            className={`py-2.5 flex items-center justify-center gap-0.5 ${
-              mode === "words"
-                ? "text-content-main"
-                : "hover:text-content-primary"
-            } duration-200 ease-out`}
-            onClick={() => setMode("words")}
-          >
-            <FaFont className="sm:text-sm md:text-base" />
-            <div className="font-semibold">words</div>
-          </button>
-          <button className="py-2.5 flex items-center justify-center gap-0.5 hover:text-content-primary duration-200 ease-out">
-            <FaQuoteLeft className="sm:text-sm md:text-base" />
-            <div className="font-semibold">quote</div>
-          </button>
-          <div
-            className="h-7 rounded-full sm:w-[2px] md:w-[3px] lg:w-[4px] bg-base-primary"
-            aria-hidden={true}
-          />
-          <button
-            className={`${
-              option === 15 ? "text-content-main" : "hover:text-content-primary"
-            } duration-200 ease-out font-semibold`}
-            onClick={() => setOption(15)}
-          >
-            15
-          </button>
-          <button
-            className={`${
-              option === 30 ? "text-content-main" : "hover:text-content-primary"
-            } duration-200 ease-out font-semibold`}
-            onClick={() => setOption(30)}
-          >
-            30
-          </button>
-          <button
-            className={`${
-              option === 60 ? "text-content-main" : "hover:text-content-primary"
-            } duration-200 ease-out font-semibold`}
-            onClick={() => setOption(60)}
-          >
-            60
-          </button>
-          <button
-            className={`${
-              option === 120
-                ? "text-content-main"
-                : "hover:text-content-primary"
-            } duration-200 ease-out font-semibold`}
-            onClick={() => setOption(120)}
-          >
-            120
-          </button>
-          <button className="sm:text-sm md:text-base hover:text-content-primary duration-200 ease-out">
-            <FaTools />
-          </button>
-        </div>
-      </div>
+    <div className="flex flex-col justify-between">
       <div className="flex items-center flex-col gap-6 text-content-secondary">
         <div className="flex items-center gap-1.5 text-sm font-roboto font-semibold hover:text-content-primary duration-200 cursor-pointer">
           <FaEarthAmericas className="text-lg" />
           english
         </div>
-        <div className="place-self-start text-content-main text-3xl">
-          {mode === "time" ? timer : ""}
-        </div>
+        <Timer/>
         <div
           className={`relative font-roboto`}
           tabIndex={0}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => toggleIsFocused()}
         >
           <div
-            className={`relative h-[145px] overflow-y-hidden ${
+            className={`px-2 relative h-[145px] overflow-y-hidden ${
               !isFocused ? "blur-[10px]" : ""
             } ] text-left select-none scroll-smooth`}
             ref={paragraphRef}
           >
-            {words &&
-              [...words.join(" ").split(""), " "].map((char, index) => (
+            {matter &&
+              [...matter.split(""), " "].map((char, index) => (
                 <span
                   style={{
                     borderBottomWidth: "2px",
@@ -309,15 +142,13 @@ const TypingInput = () => {
               ))}
             <div
               ref={caretRef}
-              className={`${
-                isFocused ? "block" : "hidden"
-              } duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
+              className={`duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
             />
           </div>
           {!isFocused && (
             <div
               className="select-none absolute cursor-default top-1/3 left-1/2 -translate-x-1/2 text-base flex items-center justify-center gap-1 text-content-primary"
-              onClick={() => setIsFocused(true)}
+              onClick={() => toggleIsFocused()}
             >
               <GiArrowCursor />
               Click here or press any where to focus
@@ -327,8 +158,8 @@ const TypingInput = () => {
 
         <button
           onClick={(e) => {
-            genWords();
-            setIsFocused(true);
+            genMatter();
+            toggleIsFocused();
 
             const prevRotation = parseInt(e.currentTarget.style.rotate);
             e.currentTarget.style.rotate = (prevRotation || 0) + 360 + "deg";
@@ -340,7 +171,7 @@ const TypingInput = () => {
       </div>
       <input
         onBlur={() => {
-          if (isFocused) setIsFocused(false);
+          if (isFocused) toggleIsFocused();
         }}
         type="text"
         id="typing-input"
@@ -364,8 +195,107 @@ const TypingInput = () => {
           }
         }}
       />
-    </main>
+    </div>
   );
 };
 
 export default TypingInput;
+
+// return (
+//   <main className="flex-1 flex flex-col gap-10">
+//     <TypingInput />
+//     <div className="flex items-center flex-col gap-6 text-content-secondary">
+//       <div className="flex items-center gap-1.5 text-sm font-roboto font-semibold hover:text-content-primary duration-200 cursor-pointer">
+//         <FaEarthAmericas className="text-lg" />
+//         english
+//       </div>
+//       {mode === "time" && (
+//         <div className="place-self-start text-content-main text-3xl">
+//           {time}
+//         </div>
+//       )}
+//       <div
+//         className={`relative font-roboto`}
+//         tabIndex={0}
+//         onFocus={() => toggleIsFocused(true)}
+//       >
+//         <div
+//           className={`relative h-[145px] overflow-y-hidden ${
+//             !isFocused ? "blur-[10px]" : ""
+//           } ] text-left select-none scroll-smooth`}
+//           ref={paragraphRef}
+//         >
+//           {matter &&
+//             [...matter.split(""), " "].map((char, index) => (
+//               <span
+//                 style={{
+//                   borderBottomWidth: "2px",
+//                   borderBottomStyle: "solid",
+//                   borderColor: "transparent",
+//                 }}
+//                 className={`leading-[50px] duration-100 ease-in text-[30px]`}
+//                 key={index}
+//                 ref={(e) => {
+//                   charRefs.current[index] = e;
+//                 }}
+//               >
+//                 {char}
+//               </span>
+//             ))}
+//           <div
+//             ref={caretRef}
+//             className={`duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
+//           />
+//         </div>
+//         {!isFocused && (
+//           <div
+//             className="select-none absolute cursor-default top-1/3 left-1/2 -translate-x-1/2 text-base flex items-center justify-center gap-1 text-content-primary"
+//             onClick={() => toggleIsFocused(true)}
+//           >
+//             <GiArrowCursor />
+//             Click here or press any where to focus
+//           </div>
+//         )}
+//       </div>
+
+//       <button
+//         onClick={(e) => {
+//           genMatter();
+//           toggleIsFocused(true);
+
+//           const prevRotation = parseInt(e.currentTarget.style.rotate);
+//           e.currentTarget.style.rotate = (prevRotation || 0) + 360 + "deg";
+//         }}
+//         className="button hover:text-content-primary duration-200 text-lg ease-linear cursor-pointer"
+//       >
+//         <GrRefresh />
+//       </button>
+//     </div>
+//     <input
+//       onBlur={() => {
+//         if (isFocused) toggleIsFocused(false);
+//       }}
+//       type="text"
+//       id="typing-input"
+//       className="size-0"
+//       autoComplete="off"
+//       ref={inputRef}
+//       onChange={handleInputChange}
+//       onKeyDown={(e) => {
+//         if (
+//           ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+//         ) {
+//           e.preventDefault();
+//           return;
+//         }
+//         if (
+//           e.key === "Backspace" &&
+//           lastCorrectIndex.current === value.current.length
+//         ) {
+//           e.preventDefault();
+//           return;
+//         }
+//       }}
+//     />
+//   </main>
+// );

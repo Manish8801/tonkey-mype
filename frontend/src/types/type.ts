@@ -37,3 +37,20 @@ export interface IUser {
   testsCompleted: number;
   timeTyping: number;
 }
+export interface IGenConfigs {
+  min?: number;
+  max?: number;
+  exactly?: number;
+  join?: string;
+  number?: boolean;
+  punctuation?: boolean;
+  cases?: boolean;
+}
+
+export interface IResult {
+  wpm: number;
+  accuracy: number;
+  raw: number;
+  time: number;
+  errors: Record<string, number[]>;
+};
