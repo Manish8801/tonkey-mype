@@ -65,14 +65,14 @@ function calcWPM(time: number, typedValue: string) {
   const totalWords = typedValue.split(" ").length;
   return Math.round(60 / time) * totalWords;
 }
-function calcAccuracy(expected: string, actual: string) {
+function calcAccuracy(actual: string, expected: string) {
   let correct = 0;
   for (let i = 0; i < actual.length; i++) {
     if (expected[i] === actual[i]) correct++;
   }
   return Math.round((correct / actual.length) * 100);
 }
-function calcErrors(expected: string, actual: string) {
+function calcErrors(actual: string, expected: string) {
   const errors: Record<string, number[]> = {};
   for (let i = 0; i < actual.length; i++) {
     if (expected[i] !== actual[i]) {
@@ -81,6 +81,13 @@ function calcErrors(expected: string, actual: string) {
     }
   }
   return errors;
+}
+function calcRaw(actual: string, expected: string) {
+  let correct = 0;
+  for (let i = 0; i < actual.length; i++) {
+    if (expected[i] === actual[i]) correct++;
+  }
+  return correct;
 }
 function genMatter({
   number = false,
@@ -111,4 +118,15 @@ function genMatter({
   return join ? final.join(join) : final.join(" ");
 }
 
-export { calcWPM, calcAccuracy, calcErrors, genMatter, getOffsets, placeCaret, resetStyle, styleWrong, styleCorrect };
+export {
+  calcWPM,
+  calcAccuracy,
+  calcErrors,
+  calcRaw,
+  genMatter,
+  getOffsets,
+  placeCaret,
+  resetStyle,
+  styleWrong,
+  styleCorrect,
+};

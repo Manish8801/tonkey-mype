@@ -2,16 +2,14 @@ import { useEffect, useState } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 
 const Timer = () => {
-  const { mode, time, isFocused, toggleIsFocused, toggleIsGameOver } =
+  const { mode, matter, time, isFocused, isGameOver,overGame } =
     useGameStore();
   const [timeLeft, setTimeLeft] = useState(time);
 
   useEffect(() => {
     if (isFocused) {
-      if (timeLeft === 0) {
-        toggleIsFocused();
-        toggleIsGameOver();
-      } else {
+      if (timeLeft === 0) overGame();
+      else {
         const timer = setInterval(() => {
           setTimeLeft((timeLeft) => timeLeft - 1);
         }, 999);
@@ -20,11 +18,11 @@ const Timer = () => {
         };
       }
     }
-  }, [isFocused, timeLeft, setTimeLeft, toggleIsFocused, toggleIsGameOver]);
+  }, [isFocused, timeLeft]);
 
   useEffect(() => {
     setTimeLeft(time);
-  }, [time]);
+  }, [time, isGameOver, matter]);
 
   if (mode === "words") return null;
   return (

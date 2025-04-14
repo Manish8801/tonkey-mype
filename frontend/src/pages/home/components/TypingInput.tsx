@@ -1,14 +1,32 @@
 import useGameStore from "../../../zustand/useGameStore";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef } from "react";
 import Timer from "./Timer";
-import { getOffsets, placeCaret, resetStyle, styleCorrect, styleWrong } from "../../../utils/game.utils";
-import {FaEarthAmericas} from "react-icons/fa6";
-import { GiArrowCursor } from 'react-icons/gi';
-import { GrRefresh } from 'react-icons/gr';
-
+import {
+  calcAccuracy,
+  calcErrors,
+  calcRaw,
+  calcWPM,
+  getOffsets,
+  placeCaret,
+  resetStyle,
+  styleCorrect,
+  styleWrong,
+} from "../../../utils/game.utils";
+import { FaEarthAmericas } from "react-icons/fa6";
+import { GiArrowCursor } from "react-icons/gi";
+import { GrRefresh } from "react-icons/gr";
 
 const TypingInput = () => {
-  const {  time, matter, setResult, genMatter, isFocused, toggleIsFocused } = useGameStore();
+  const {
+    matter,
+    isFocused,
+    isGameOver,
+    time,
+    overGame,
+    setResult,
+    genMatter,
+    toggleIsFocused,
+  } = useGameStore();
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const paragraphRef = useRef<HTMLDivElement | null>(null);
   const caretRef = useRef<HTMLDivElement | null>(null);
@@ -16,11 +34,11 @@ const TypingInput = () => {
   const lastCorrectIndex = useRef<number>(0);
   const value = useRef<string>("");
   const yCoordFirstLine = useRef<number>(0);
-  const [timer, setTimer] = useState<number>(time);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
     if (valueLength >= paragraphRef.current!.children.length + 1) {
+      overGame();
       e.preventDefault();
       e.target.value = value.current;
       return;
@@ -78,32 +96,32 @@ const TypingInput = () => {
   }, [isFocused]);
 
   useEffect(() => {
+    setResult({
+      time,
+      wpm: calcWPM(time, value.current.trim()),
+      accuracy: calcAccuracy(value.current.trim(), matter),
+      raw: calcRaw(value.current.trim(), matter),
+      errors: calcErrors(value.current.trim(), matter),
+    });
+    toggleIsFocused();
+    genMatter();
+  }, [isGameOver]);
+
+  useEffect(() => {
     if (inputRef.current) inputRef.current.value = "";
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
-
     charRefs.current.forEach((span) => {
       if (span) resetStyle(span);
     });
 
-    const defaultSpan = charRefs.current[0];
-    if (!defaultSpan) return;
-    const { x, y } = getOffsets(defaultSpan);
-    yCoordFirstLine.current = y;
-    if (caretRef.current) placeCaret(caretRef.current, { x, y });
+    if (charRefs.current[0]) {
+      const { x, y } = getOffsets(charRefs.current[0]);
+      yCoordFirstLine.current = y;
+      if (caretRef.current) placeCaret(caretRef.current, { x, y });
+    }
 
     setResult(null);
   }, [matter, setResult]);
-
-
-  useEffect(() => {
-    if (isFocused) {
-      const interval = setInterval(() => {
-        if (time > 0) setTimer(timer - 1);
-      }, 999);
-      return () => clearInterval(interval);
-    }
-  }, [isFocused, time]);
-
   return (
     <div className="flex flex-col justify-between">
       <div className="flex items-center flex-col gap-6 text-content-secondary">
@@ -111,7 +129,7 @@ const TypingInput = () => {
           <FaEarthAmericas className="text-lg" />
           english
         </div>
-        <Timer/>
+        <Timer />
         <div
           className={`relative font-roboto`}
           tabIndex={0}
@@ -180,6 +198,10 @@ const TypingInput = () => {
         ref={inputRef}
         onChange={handleInputChange}
         onKeyDown={(e) => {
+          if (!isFocused) {
+            e.preventDefault();
+            return;
+          }
           if (
             ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
           ) {

@@ -13,7 +13,8 @@ type TStore = {
   time: number;
   totalWords: number;
   isGameOver: boolean;
-  toggleIsGameOver: () => void;
+  overGame: () => void;
+  restartGame: () => void;
   toggleIsFocused: () => void;
   genMatter: () => void;
   toggleMode: () => void;
@@ -36,7 +37,8 @@ const useGameStore = create<TStore>()((set, get) => ({
   time: 15,
   totalWords: 20,
   isGameOver: false,
-  toggleIsGameOver: () => set({ isGameOver: !get().isGameOver }),
+  overGame: () => set({ isGameOver: true }),
+  restartGame: () => set({ isGameOver: false }),
   toggleIsFocused: () => set({ isFocused: !get().isFocused }),
   setTime: (time) => set({ time }),
   setResult: (result) => set({ result }),
