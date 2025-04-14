@@ -3,48 +3,55 @@ import { FaCrown } from "react-icons/fa";
 
 const Result = () => {
   return (
-    <div className="grid grid-cols-10 space-x-4 font-roboto pt-6">
-      <div className="">
-        <div className="">
-          <div className="text-content-secondary text-4xl flex items-center justify-between">
+    <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
+      {/* first row */}
+      <div className="w-fit mx-auto justify-self-center xs:justify-self-auto flex flex-col xs:w-full xs:flex-row xs:justify-evenly md:flex-col md:justify-start md:gap-4">
+        <div>
+          <div className="text-content-secondary text-3xl sm:text-4xl flex items-center justify-center gap-2">
             wpm
-            <div className="bg-content-main text-base-primary text-base p-1.5 rounded-xl inline-block">
+            <div className="bg-content-main text-base-primary inline-block text-xs sm:text-base p-1 sm:p-1.5 md:2 rounded-full">
               <FaCrown className="" />
             </div>
           </div>
-          <div className="text-content-main text-6xl">56</div>
+          <div className="text-content-main text-5xl sm:text-6xl">56</div>
         </div>
-        <div className="">
-          <div className="text-content-secondary text-4xl">acc</div>
-          <div className="text-content-main text-6xl">98%</div>
+        <div>
+          <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
+          <div className="text-content-main text-5xl sm:text-6xl">98%</div>
         </div>
       </div>
-      <Graph />
-      {/* text-type */}
-          <div className="">
-              <div className="text-content-secondary">test type</div>
-              <div className="text-content-main font-lexand">time 15</div>
-              <div className="text-content-main font-lexand">english</div>
-              <div className="text-content-main font-lexand">punctuation</div>
+
+      <div className="">
+        <Graph />
       </div>
-      {/* details */}
-      <div className="col-span-9 flex justify-around items-center text-center">
-        <div>
-          <div className="text-content-secondary text-base">raw</div>
-          <div className="text-content-main text-3xl">56</div>
-        </div>
-        <div>
-          <div className="text-content-secondary text-base">characters</div>
-          <div className="text-content-main text-3xl">70/0/0/0</div>
-        </div>
-        <div>
-          <div className="text-content-secondary text-base">consistency</div>
-          <div className="text-content-main text-3xl">52%</div>
-        </div>
-        <div>
-          <div className="text-content-secondary text-base">time</div>
-          <div className="text-content-main text-3xl">15s</div>
-          <div className="text-xs text-content-secondary">00:00:15 session</div>
+      {/* second row */}
+      <div className="justify-self-center md:justify-self-auto font-lexend">
+        <div className="text-content-secondary">test type</div>
+        <div className="text-content-main ">time 15</div>
+        <div className="text-content-main ">english</div>
+        <div className="text-content-main ">punctuation</div>
+      </div>
+      <div>
+        <div className="flex-1 grid text-center xs:grid-cols-2 justify-items-center-safe  xs:gap-y-2 md:grid-cols-4">
+          <div>
+            <div className="text-content-secondary text-base">raw</div>
+            <div className="text-content-main text-3xl">56</div>
+          </div>
+          <div>
+            <div className="text-content-secondary text-base">characters</div>
+            <div className="text-content-main text-3xl">70/0/0/0</div>
+          </div>
+          <div>
+            <div className="text-content-secondary text-base">consistency</div>
+            <div className="text-content-main text-3xl">52%</div>
+          </div>
+          <div>
+            <div className="text-content-secondary text-base">time</div>
+            <div className="text-content-main text-3xl">15s</div>
+            <div className="text-[10px] text-content-secondary tracking-wider">
+              00:00:15 session
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -52,3 +59,30 @@ const Result = () => {
 };
 
 export default Result;
+//  <div className="flex flex-wrap w-full font-roboto gap-4">
+//       {/* mota result */}
+//       <div className="w-fit bg-gray-200">
+//         <div className="">
+//           <div className="text-content-secondary text-3xl sm:text-4xl flex gap-2 items-center justify-between">
+//             wpm
+//             <div className="bg-content-main text-base-primary inline-block text-xs sm:text-base p-1.5 rounded-full">
+//               <FaCrown className="" />
+//             </div>
+//           </div>
+//           <div className="text-content-main text-5xl sm:text-6xl">56</div>
+//         </div>
+//         <div className="">
+//           <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
+//           <div className="text-content-main text-5xl sm:text-6xl">98%</div>
+//         </div>
+//       </div>
+//       {/* graph */}
+//       <Graph />
+//       {/* text-type */}
+//       <div className="w-fit">
+//
+//       </div>
+//       {/* details */}
+
+//
+//     </div>

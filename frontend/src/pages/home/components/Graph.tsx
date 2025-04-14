@@ -1,5 +1,6 @@
 import { Line } from "react-chartjs-2";
 import {
+  Filler,
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
@@ -9,8 +10,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import useGameStore from "../../../zustand/useGameStore";
 
 ChartJS.register(
+  Filler,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -21,11 +24,13 @@ ChartJS.register(
 );
 
 const Graph = () => {
+  const { result } = useGameStore();
   const data = {
-    labels: [15], // x-axis time in seconds
+    labels: [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    ], // x-axis time in seconds
     datasets: [
       {
-        fill: false,
         label: "Errors",
         pointStyle: "crossRot",
         pointRadius: 3,
@@ -33,38 +38,36 @@ const Graph = () => {
         showLine: false,
         borderColor: "#FF5733",
         pointBackgroundColor: "#ff5733",
-        data: [4],
+        data: [1, 76, 20, 34],
         yAxisId: "y1",
       },
       {
         tension: 0.4,
-        fill: true,
         label: "WPM",
-        data: [120],
         borderColor: "#e2b714",
-        backgroundColor: "#ff0000",
+        backgroundColor: "rgba(0,0,0,.3)",
         pointBackgroundColor: "#e2b714",
         yAxisId: "y",
+        data: [10, 20, 30, 40, 50],
       },
       {
         label: "Raw",
-        fill: true,
         yAxisId: "y",
+        fill: true,
         tension: 0.4,
         boxPadding: 0,
         borderColor: "#646669",
-        backgroundColor: "--graph-b",
+        backgroundColor: "rgba(0,0,0,.3)",
         usePointStyle: true,
         pointBackgroundColor: "#646669",
-        data: [150],
+        data: [20, 30, 10, 60, 80],
       },
     ],
   };
 
   const options = {
-    type: "logarithmic",
+    aspectRatio: 4,
     responsive: true,
-    aspectRatio: 5,
     plugins: {
       legend: {
         display: false,
@@ -91,7 +94,6 @@ const Graph = () => {
     scales: {
       x: {
         type: "linear" as const,
-        min : 1,
         title: {
           font: {
             weight: "bold" as const,
@@ -104,14 +106,14 @@ const Graph = () => {
 
         ticks: {
           maxTicksLimit: 15,
-          color: "#646669" as const,
+          color: "#646669",
           font: {
             size: 14,
           },
         },
         grid: {
           display: true,
-          color: "rgba(0,0,0,.1)" as const,
+          color: "rgba(0,0,0,.1)",
         },
       },
       y: {
@@ -125,14 +127,14 @@ const Graph = () => {
           },
           align: "center" as const,
           display: true,
-          text: "Words per minute" as const, // Label for left y-axis
+          text: "Words per minute", // Label for left y-axis
         },
         ticks: {
-          maxTicksLimit: 4,
+          maxTicksLimit: 5,
           color: "#646669" as const,
         },
         grid: {
-          color: "rgba(0,0,0,.1)" as const,
+          color: "rgba(0,0,0,.1)",
         },
       },
       y1: {
@@ -145,25 +147,21 @@ const Graph = () => {
           },
           align: "center" as const,
           display: true,
-          text: "Errors" as const,
+          text: "Errors",
         },
         ticks: {
           maxTicksLimit: 2,
-          color: "#646669" as const,
+          color: "#646669",
         },
         grid: {
           drawOnChartArea: false,
-          color: "rgba(0,0,0,0.1)" as const,
+          color: "rgba(0,0,0,0.1)",
         },
       },
     },
   };
 
-  return (
-    <div className="col-span-9">
-      <Line options={options} data={data} />
-    </div>
-  );
+  return <Line options={options} data={data} />;
 };
 
 export default Graph;
