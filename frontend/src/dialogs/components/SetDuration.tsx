@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import useGameStore from "../../zustand/useGameStore";
-import formatTime from "../../utils/helper";
+import {formatTime} from "../../utils/helper";
 import useDialogStore from "../../zustand/useDialogStore";
 
 const SetDuration = () => {

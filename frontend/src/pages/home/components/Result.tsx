@@ -1,7 +1,9 @@
+import useGameStore from "../../../zustand/useGameStore";
 import Graph from "./Graph";
 import { FaCrown } from "react-icons/fa";
 
 const Result = () => {
+  const { result, time, number, punctuation, cases } = useGameStore();
   return (
     <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
       {/* first row */}
@@ -13,11 +15,15 @@ const Result = () => {
               <FaCrown className="" />
             </div>
           </div>
-          <div className="text-content-main text-5xl sm:text-6xl">56</div>
+          <div className="text-content-main text-5xl sm:text-6xl">
+            {result?.wpm}
+          </div>
         </div>
         <div>
           <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
-          <div className="text-content-main text-5xl sm:text-6xl">98%</div>
+          <div className="text-content-main text-5xl sm:text-6xl">
+            {result?.accuracy}%
+          </div>
         </div>
       </div>
 
@@ -27,15 +33,17 @@ const Result = () => {
       {/* second row */}
       <div className="justify-self-center md:justify-self-auto font-lexend">
         <div className="text-content-secondary">test type</div>
-        <div className="text-content-main ">time 15</div>
+        <div className="text-content-main ">time {time}</div>
         <div className="text-content-main ">english</div>
-        <div className="text-content-main ">punctuation</div>
+        {cases && <div className="text-content-main ">cases</div>}
+        {number && <div className="text-content-main ">number</div>}
+        {punctuation && <div className="text-content-main ">punctuation</div>}
       </div>
       <div>
         <div className="flex-1 grid text-center xs:grid-cols-2 justify-items-center-safe  xs:gap-y-2 md:grid-cols-4">
           <div>
             <div className="text-content-secondary text-base">raw</div>
-            <div className="text-content-main text-3xl">56</div>
+            <div className="text-content-main text-3xl">{result?.raw}</div>
           </div>
           <div>
             <div className="text-content-secondary text-base">characters</div>

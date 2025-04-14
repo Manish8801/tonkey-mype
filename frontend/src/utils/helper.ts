@@ -6,4 +6,8 @@ function formatTime({ h, m, s }: { h: number; m: number; s: number }) {
 
   return { hours, minutes, seconds, timeInSec };
 }
-export default formatTime;
+
+function getNumArr(length: number) {
+  return Array.from({ length }, (_, i) => i + 1);
+}
+export { formatTime, getNumArr };

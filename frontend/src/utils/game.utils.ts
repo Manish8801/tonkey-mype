@@ -61,33 +61,49 @@ function getPunctuation() {
 
   return punctuations[0 + floor(random() * punctuations.length)];
 }
-function calcWPM(time: number, typedValue: string) {
-  const totalWords = typedValue.split(" ").length;
-  return Math.round(60 / time) * totalWords;
+function calcWPM(time: number, actual: string, expected: string) {
+  let correct = 0;
+  const [actualWords, expectedWords] = [actual.split(" "), expected.split(" ")];
+  for (let i = 0; i < actualWords.length; i++) {
+    if (expectedWords[i] === actualWords[i]) correct++;
+  }
+  return (60 / time) * correct;
 }
 function calcAccuracy(actual: string, expected: string) {
   let correct = 0;
-  for (let i = 0; i < actual.length; i++) {
-    if (expected[i] === actual[i]) correct++;
+  const [actualWords, expectedWords] = [actual.split(" "), expected.split(" ")];
+  for (let i = 0; i < actualWords.length; i++) {
+    if (expectedWords[i] === actualWords[i]) correct++;
   }
-  return Math.round((correct / actual.length) * 100);
+  return (correct / actualWords.length) * correct;
 }
 function calcErrors(actual: string, expected: string) {
-  const errors: Record<string, number[]> = {};
-  for (let i = 0; i < actual.length; i++) {
-    if (expected[i] !== actual[i]) {
-      if (expected[i] in errors) errors[expected[i]].push(i);
-      else errors[expected[i]] = [i];
+  const errors: { [key: string]: number[] } = {};
+  const [actualWords, expectedWords] = [
+    actual.replaceAll(" ", ""),
+    expected.replaceAll(" ", ""),
+  ];
+
+  for (let i = 0; i < actualWords.length; i++) {
+    if (actualWords[i] !== expectedWords[i]) {
+      if (actualWords[i] in errors) errors[actualWords[i]].push(i);
+      else errors[actualWords[i]] = [i];
     }
   }
   return errors;
 }
-function calcRaw(actual: string, expected: string) {
-  let correct = 0;
-  for (let i = 0; i < actual.length; i++) {
-    if (expected[i] === actual[i]) correct++;
+function getErrArr(errors: { [key: string]: number[] }) {
+  const values: number[][] = Object.values(errors);
+  let arr: number[] = [];
+  for (const value of values) {
+    if (Array.isArray(value)) {
+      arr = [...arr, ...value];
+    }
   }
-  return correct;
+  return arr;
+}
+function calcRaw(time: number, actual: string) {
+  return round(60 / time) * actual.split(" ").length;
 }
 function genMatter({
   number = false,
@@ -128,5 +144,6 @@ export {
   placeCaret,
   resetStyle,
   styleWrong,
+  getErrArr,
   styleCorrect,
 };

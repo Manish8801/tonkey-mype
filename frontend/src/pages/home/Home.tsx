@@ -1,14 +1,18 @@
-import Graph from "./components/Graph";
+import useGameStore from "../../zustand/useGameStore";
 import Result from "./components/Result";
 import Input from "./components/TypingInput";
 import TypingSetting from "./components/TypingSetting";
 
 const Home = () => {
-  return (
+  const { isGameOver } = useGameStore();
+  return isGameOver ? (
     <main className="flex-1 flex flex-col gap-10">
       <Result />
-      {/* <TypingSetting />
-      <Input /> */}
+    </main>
+  ) : (
+    <main className="flex-1 flex flex-col gap-10">
+      <TypingSetting />
+      <Input />
     </main>
   );
 };

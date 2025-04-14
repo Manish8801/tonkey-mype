@@ -11,6 +11,9 @@ import {
   Legend,
 } from "chart.js";
 import useGameStore from "../../../zustand/useGameStore";
+import { getNumArr } from "../../../utils/helper";
+import { useEffect, useRef } from "react";
+import { getErrArr } from "../../../utils/game.utils";
 
 ChartJS.register(
   Filler,
@@ -24,11 +27,23 @@ ChartJS.register(
 );
 
 const Graph = () => {
-  const { result } = useGameStore();
+  const { result, isGameOver } = useGameStore();
+  const time = useRef<number[]>([]);
+  const wpm = useRef<number[]>([]);
+  const raw = useRef<number[]>([]);
+  const errors = useRef<number[]>([]);
+
+  useEffect(() => {
+    if (result) {
+      time.current = getNumArr(result.time);
+      wpm.current = getNumArr(result.wpm);
+      raw.current = getNumArr(result.raw);
+      errors.current = getErrArr(result.errors);
+    }
+  }, [isGameOver]);
+
   const data = {
-    labels: [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    ], // x-axis time in seconds
+    labels: time.current, // x-axis time in seconds
     datasets: [
       {
         label: "Errors",
@@ -38,7 +53,7 @@ const Graph = () => {
         showLine: false,
         borderColor: "#FF5733",
         pointBackgroundColor: "#ff5733",
-        data: [1, 76, 20, 34],
+        data: errors.current,
         yAxisId: "y1",
       },
       {
@@ -48,7 +63,7 @@ const Graph = () => {
         backgroundColor: "rgba(0,0,0,.3)",
         pointBackgroundColor: "#e2b714",
         yAxisId: "y",
-        data: [10, 20, 30, 40, 50],
+        data: wpm.current,
       },
       {
         label: "Raw",
@@ -60,7 +75,7 @@ const Graph = () => {
         backgroundColor: "rgba(0,0,0,.3)",
         usePointStyle: true,
         pointBackgroundColor: "#646669",
-        data: [20, 30, 10, 60, 80],
+        data: raw.current,
       },
     ],
   };

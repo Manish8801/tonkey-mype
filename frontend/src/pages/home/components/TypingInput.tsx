@@ -15,12 +15,10 @@ import {
 import { FaEarthAmericas } from "react-icons/fa6";
 import { GiArrowCursor } from "react-icons/gi";
 import { GrRefresh } from "react-icons/gr";
-
 const TypingInput = () => {
   const {
     matter,
     isFocused,
-    isGameOver,
     time,
     overGame,
     setResult,
@@ -92,20 +90,32 @@ const TypingInput = () => {
   };
 
   useEffect(() => {
-    if (isFocused) inputRef.current?.focus();
-  }, [isFocused]);
-
-  useEffect(() => {
     setResult({
       time,
-      wpm: calcWPM(time, value.current.trim()),
+      wpm: calcWPM(time, value.current.trim(), matter),
       accuracy: calcAccuracy(value.current.trim(), matter),
-      raw: calcRaw(value.current.trim(), matter),
+      raw: calcRaw(time, value.current.trim()),
       errors: calcErrors(value.current.trim(), matter),
     });
-    toggleIsFocused();
+    console.log(
+      Object.values({
+        time,
+        wpm: calcWPM(time, value.current.trim(), matter),
+        accuracy: calcAccuracy(value.current.trim(), matter),
+        raw: calcRaw(time, value.current.trim()),
+        errors: calcErrors(value.current.trim(), matter),
+      })
+    );
     genMatter();
-  }, [isGameOver]);
+
+    return () => {
+      setResult(null);
+      genMatter();
+    };
+  }, []);
+  useEffect(() => {
+    if (isFocused) inputRef.current?.focus();
+  }, [isFocused]);
 
   useEffect(() => {
     if (inputRef.current) inputRef.current.value = "";

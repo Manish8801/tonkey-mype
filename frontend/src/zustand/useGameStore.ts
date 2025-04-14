@@ -41,7 +41,10 @@ const useGameStore = create<TStore>()((set, get) => ({
   restartGame: () => set({ isGameOver: false }),
   toggleIsFocused: () => set({ isFocused: !get().isFocused }),
   setTime: (time) => set({ time }),
-  setResult: (result) => set({ result }),
+  setResult: (result) => {
+    console.log(result);
+     set({ result });
+  },
   toggleCases: () => set({ cases: !get().cases }),
   toggleNumber: () => set({ number: !get().number }),
   setTotalWords: (totalWords) => set({ totalWords }),
