@@ -4,8 +4,8 @@ import useGameStore from "../../zustand/useGameStore";
 
 const SetWordCount = () => {
   const { isWordCountDialogOpen, toggleWordCountDialog } = useDialogStore();
-  const { totalWords, setTotalWords } = useGameStore();
-  const [value, setValue] = useState<number>(totalWords);
+  const { wordCount, setWordCount } = useGameStore();
+  const [value, setValue] = useState<number>(wordCount);
   const dialogRef = useRef<HTMLFormElement | null>(null);
 
   const handleOutSideClick = (e: MouseEvent) => {
@@ -15,7 +15,7 @@ const SetWordCount = () => {
   };
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTotalWords(value);
+    setWordCount(value);
     toggleWordCountDialog();
   };
 

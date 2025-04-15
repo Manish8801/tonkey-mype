@@ -12,11 +12,11 @@ const TypingSetting = () => {
     number,
     punctuation,
     time,
-    totalWords,
+    wordCount,
     toggleCases,
     genMatter,
     setTime,
-    setTotalWords,
+    setWordCount,
     toggleMode,
     toggleNumber,
     togglePunctuation,
@@ -26,7 +26,7 @@ const TypingSetting = () => {
 
   useEffect(() => {
     genMatter();
-  }, [number, punctuation, cases, mode, time, totalWords, genMatter]);
+  }, [number, punctuation, cases, mode, time, wordCount, genMatter]);
 
   return (
     <div className="bg-[rgba(0,0,0,.13)] text-config flex items-center justify-center mx-auto px-4 C w-fit rounded-lg text-content-secondary  leading-4">
@@ -101,13 +101,13 @@ const TypingSetting = () => {
         <button
           className={`${
             (mode === "time" && time === 15) ||
-            (mode === "words" && totalWords === 10)
+            (mode === "words" && wordCount === 10)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           }  ease-out font-semibold`}
           onClick={() => {
             if (mode === "time") setTime(15);
-            else setTotalWords(10);
+            else setWordCount(10);
           }}
         >
           {mode === "time" ? 15 : 10}
@@ -115,13 +115,13 @@ const TypingSetting = () => {
         <button
           className={`${
             (mode === "time" && time === 30) ||
-            (mode === "words" && totalWords === 20)
+            (mode === "words" && wordCount === 20)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           }  ease-out font-semibold`}
           onClick={() => {
             if (mode === "time") setTime(30);
-            setTotalWords(20);
+            setWordCount(20);
           }}
         >
           {mode === "time" ? 30 : 20}
@@ -129,13 +129,13 @@ const TypingSetting = () => {
         <button
           className={`${
             (mode === "time" && time === 60) ||
-            (mode === "words" && totalWords === 50)
+            (mode === "words" && wordCount === 50)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           } ease-out font-semibold`}
           onClick={() => {
             if (mode === "time") setTime(60);
-            setTotalWords(50);
+            setWordCount(50);
           }}
         >
           {mode === "time" ? 60 : 50}
@@ -143,13 +143,13 @@ const TypingSetting = () => {
         <button
           className={`${
             (mode === "time" && time === 120) ||
-            (mode === "words" && totalWords === 100)
+            (mode === "words" && wordCount === 100)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           } ease-out font-semibold`}
           onClick={() => {
             if (mode === "time") setTime(120);
-            setTotalWords(100);
+            setWordCount(100);
           }}
         >
           {mode === "time" ? 120 : 100}

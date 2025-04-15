@@ -3,6 +3,7 @@ import { genMatter } from "../utils/game.utils";
 import type { IGenConfigs, IResult } from "../types/type";
 
 type TStore = {
+  actual: string;
   isFocused: boolean;
   cases: boolean;
   matter: string;
@@ -11,8 +12,11 @@ type TStore = {
   punctuation: boolean;
   result: IResult | null;
   time: number;
-  totalWords: number;
+  wordCount: number;
   isGameOver: boolean;
+  resultShown: boolean;
+  setActual: (actual: string) => void;
+  toggleResult: () => void;
   overGame: () => void;
   restartGame: () => void;
   toggleIsFocused: () => void;
@@ -22,11 +26,12 @@ type TStore = {
   toggleNumber: () => void;
   togglePunctuation: () => void;
   setTime: (time: number) => void;
-  setTotalWords: (totalWords: number) => void;
+  setWordCount: (wordCount: number) => void;
   setResult: (result: IResult | null) => void;
 };
 
 const useGameStore = create<TStore>()((set, get) => ({
+  actual: "",
   isFocused: false,
   cases: false,
   matter: "",
@@ -35,27 +40,30 @@ const useGameStore = create<TStore>()((set, get) => ({
   punctuation: false,
   result: null,
   time: 15,
-  totalWords: 20,
+  wordCount: 20,
   isGameOver: false,
+  resultShown: false,
+  setActual: (actual) => set({ actual }),
+  toggleResult: () => set({ resultShown: !get().resultShown }),
   overGame: () => set({ isGameOver: true }),
   restartGame: () => set({ isGameOver: false }),
   toggleIsFocused: () => set({ isFocused: !get().isFocused }),
   setTime: (time) => set({ time }),
   setResult: (result) => {
     console.log(result);
-     set({ result });
+    set({ result });
   },
   toggleCases: () => set({ cases: !get().cases }),
   toggleNumber: () => set({ number: !get().number }),
-  setTotalWords: (totalWords) => set({ totalWords }),
+  setWordCount: (wordCount) => set({ wordCount }),
   togglePunctuation: () => set({ punctuation: !get().punctuation }),
   toggleMode: () => set({ mode: get().mode === "words" ? "time" : "words" }),
   genMatter: () => {
-    const { number, punctuation, cases, mode, time, totalWords } = get();
+    const { number, punctuation, cases, mode, time, wordCount } = get();
 
     const configs: IGenConfigs = { number, punctuation, cases };
 
-    if (mode === "words") configs.exactly = totalWords;
+    if (mode === "words") configs.exactly = wordCount;
     else configs.min = time * 5;
 
     set({ matter: genMatter(configs) });

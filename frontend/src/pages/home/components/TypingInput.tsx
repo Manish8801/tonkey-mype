@@ -2,10 +2,6 @@ import useGameStore from "../../../zustand/useGameStore";
 import { ChangeEvent, useEffect, useRef } from "react";
 import Timer from "./Timer";
 import {
-  calcAccuracy,
-  calcErrors,
-  calcRaw,
-  calcWPM,
   getOffsets,
   placeCaret,
   resetStyle,
@@ -20,8 +16,13 @@ const TypingInput = () => {
     matter,
     isFocused,
     time,
+    wordCount,
+    number,
+    punctuation,
+    cases,
+    mode, 
+    setActual,
     overGame,
-    setResult,
     genMatter,
     toggleIsFocused,
   } = useGameStore();
@@ -89,34 +90,20 @@ const TypingInput = () => {
     }
   };
 
-  useEffect(() => {
-    setResult({
-      time,
-      wpm: calcWPM(time, value.current.trim(), matter),
-      accuracy: calcAccuracy(value.current.trim(), matter),
-      raw: calcRaw(time, value.current.trim()),
-      errors: calcErrors(value.current.trim(), matter),
-    });
-    console.log(
-      Object.values({
-        time,
-        wpm: calcWPM(time, value.current.trim(), matter),
-        accuracy: calcAccuracy(value.current.trim(), matter),
-        raw: calcRaw(time, value.current.trim()),
-        errors: calcErrors(value.current.trim(), matter),
-      })
-    );
-    genMatter();
-
-    return () => {
-      setResult(null);
-      genMatter();
-    };
-  }, []);
+  // don't touch it
   useEffect(() => {
     if (isFocused) inputRef.current?.focus();
   }, [isFocused]);
 
+  useEffect(() => {
+    genMatter();
+    return () => setActual(value.current.trim());
+  }, []);
+
+  useEffect(() => {
+    genMatter();
+  }, [mode, time, wordCount, number, punctuation, cases]);
+  
   useEffect(() => {
     if (inputRef.current) inputRef.current.value = "";
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
@@ -129,9 +116,7 @@ const TypingInput = () => {
       yCoordFirstLine.current = y;
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
     }
-
-    setResult(null);
-  }, [matter, setResult]);
+  }, [matter]);
   return (
     <div className="flex flex-col justify-between">
       <div className="flex items-center flex-col gap-6 text-content-secondary">
@@ -159,7 +144,7 @@ const TypingInput = () => {
                     borderBottomStyle: "solid",
                     borderColor: "transparent",
                   }}
-                  className={`leading-[50px] duration-100 ease-in text-[30px]`}
+                  className={`leading-[50px] duration-75 ease-in text-[30px]`}
                   key={index}
                   ref={(e) => {
                     charRefs.current[index] = e;

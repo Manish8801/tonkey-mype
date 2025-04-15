@@ -29,7 +29,7 @@ export interface IUser {
   avatar: string;
   highestWordsPerMinute: number;
   bestAccuracy: number;
-  totalWordsTyped: number;
+  wordCountTyped: number;
   testHistory: Array<any>;
   createdAt: string;
   updatedAt: string;

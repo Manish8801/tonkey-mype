@@ -1,9 +1,13 @@
+import { useEffect } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 import Graph from "./Graph";
 import { FaCrown } from "react-icons/fa";
 
 const Result = () => {
   const { result, time, number, punctuation, cases } = useGameStore();
+  useEffect(() => {
+    console.log(result);
+  }, [])
   return (
     <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
       {/* first row */}
@@ -26,7 +30,6 @@ const Result = () => {
           </div>
         </div>
       </div>
-
       <div className="">
         <Graph />
       </div>

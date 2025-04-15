@@ -67,6 +67,7 @@ function calcWPM(time: number, actual: string, expected: string) {
   for (let i = 0; i < actualWords.length; i++) {
     if (expectedWords[i] === actualWords[i]) correct++;
   }
+
   return (60 / time) * correct;
 }
 function calcAccuracy(actual: string, expected: string) {
@@ -75,7 +76,9 @@ function calcAccuracy(actual: string, expected: string) {
   for (let i = 0; i < actualWords.length; i++) {
     if (expectedWords[i] === actualWords[i]) correct++;
   }
-  return (correct / actualWords.length) * correct;
+  const final = (correct / actualWords.length) * correct;
+  console.log(final);
+  return final;
 }
 function calcErrors(actual: string, expected: string) {
   const errors: { [key: string]: number[] } = {};
@@ -85,12 +88,15 @@ function calcErrors(actual: string, expected: string) {
   ];
 
   for (let i = 0; i < actualWords.length; i++) {
+    console.log(actualWords[i], expectedWords[i]);
     if (actualWords[i] !== expectedWords[i]) {
       if (actualWords[i] in errors) errors[actualWords[i]].push(i);
       else errors[actualWords[i]] = [i];
     }
   }
-  return errors;
+  const final = errors;
+  console.log(final);
+  return final;
 }
 function getErrArr(errors: { [key: string]: number[] }) {
   const values: number[][] = Object.values(errors);
@@ -103,7 +109,9 @@ function getErrArr(errors: { [key: string]: number[] }) {
   return arr;
 }
 function calcRaw(time: number, actual: string) {
-  return round(60 / time) * actual.split(" ").length;
+  const final = round(60 / time) * actual.split(" ").length;
+  console.log(final);
+  return final;
 }
 function genMatter({
   number = false,
