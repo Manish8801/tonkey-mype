@@ -11,9 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import useGameStore from "../../../zustand/useGameStore";
-import { getNumArr } from "../../../utils/helper";
-import { useEffect, useRef } from "react";
-import { getErrArr } from "../../../utils/game.utils";
 
 ChartJS.register(
   Filler,
@@ -27,23 +24,14 @@ ChartJS.register(
 );
 
 const Graph = () => {
-  const { result, isGameOver } = useGameStore();
-  const time = useRef<number[]>([]);
-  const wpm = useRef<number[]>([]);
-  const raw = useRef<number[]>([]);
-  const errors = useRef<number[]>([]);
-
-  useEffect(() => {
-    if (result) {
-      time.current = getNumArr(result.time);
-      wpm.current = getNumArr(result.wpm);
-      raw.current = getNumArr(result.raw);
-      errors.current = getErrArr(result.errors);
-    }
-  }, [isGameOver]);
+  const { graphData } = useGameStore();
+  const timeData = graphData?.testTime || [];
+  const wpmData = graphData?.wpmSpeeds || [];
+  const rawData = graphData?.rawSpeeds || [];
+  const errorsData = graphData?.errorIndexes || [];
 
   const data = {
-    labels: time.current, // x-axis time in seconds
+    labels: timeData, // x-axis time in seconds
     datasets: [
       {
         label: "Errors",
@@ -53,7 +41,7 @@ const Graph = () => {
         showLine: false,
         borderColor: "#FF5733",
         pointBackgroundColor: "#ff5733",
-        data: errors.current,
+        data: errorsData,
         yAxisId: "y1",
       },
       {
@@ -63,7 +51,7 @@ const Graph = () => {
         backgroundColor: "rgba(0,0,0,.3)",
         pointBackgroundColor: "#e2b714",
         yAxisId: "y",
-        data: wpm.current,
+        data: wpmData,
       },
       {
         label: "Raw",
@@ -75,7 +63,7 @@ const Graph = () => {
         backgroundColor: "rgba(0,0,0,.3)",
         usePointStyle: true,
         pointBackgroundColor: "#646669",
-        data: raw.current,
+        data: rawData,
       },
     ],
   };
@@ -113,6 +101,7 @@ const Graph = () => {
           font: {
             weight: "bold" as const,
             size: 16,
+            min: 1,
           },
           align: "center" as const,
           display: true,
@@ -120,7 +109,7 @@ const Graph = () => {
         },
 
         ticks: {
-          maxTicksLimit: 15,
+          minTicksLimit: 15,
           color: "#646669",
           font: {
             size: 14,
@@ -145,7 +134,7 @@ const Graph = () => {
           text: "Words per minute", // Label for left y-axis
         },
         ticks: {
-          maxTicksLimit: 5,
+          maxTicksLimit: 4,
           color: "#646669" as const,
         },
         grid: {

@@ -4,10 +4,14 @@ import Graph from "./Graph";
 import { FaCrown } from "react-icons/fa";
 
 const Result = () => {
-  const { result, time, number, punctuation, cases } = useGameStore();
+  const { setResult, number, punctuation, cases, result, time, getGraphData } =
+    useGameStore();
+
   useEffect(() => {
-    console.log(result);
-  }, [])
+    setResult();
+    getGraphData();
+  }, []);
+
   return (
     <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
       {/* first row */}
@@ -26,7 +30,7 @@ const Result = () => {
         <div>
           <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
           <div className="text-content-main text-5xl sm:text-6xl">
-            {result?.accuracy}%
+            {result?.acc}%
           </div>
         </div>
       </div>

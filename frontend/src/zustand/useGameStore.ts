@@ -1,8 +1,24 @@
 import { create } from "zustand";
-import { genMatter } from "../utils/game.utils";
-import type { IGenConfigs, IResult } from "../types/type";
+import {
+  calcAccuracy,
+  calcErrors,
+  calcRaw,
+  calcWPM,
+  genMatter,
+} from "../utils/game.utils";
+import type { IGenConfigs, IGraphData, IResult } from "../types/type";
+import {
+  getNumArr,
+  getWpmSpeed,
+  getRawSpeed,
+  getErrors,
+} from "../utils/helper";
 
 type TStore = {
+  errors: { [key: string]: number };
+  startTime: number;
+  isTypingStarted: boolean;
+  wordTimingMap: { [key: string]: number } | null;
   actual: string;
   isFocused: boolean;
   cases: boolean;
@@ -15,6 +31,16 @@ type TStore = {
   wordCount: number;
   isGameOver: boolean;
   resultShown: boolean;
+  graphData: IGraphData | null;
+  toggleIsTypingStarted: () => void;
+  setWordTimingMap: (
+    startTime: number,
+    timingMap: {
+      [key: string]: number;
+    }
+  ) => void;
+  setErrors: (errors: { [key: string]: number }) => void;
+  setStartTime: (startTime: number) => void;
   setActual: (actual: string) => void;
   toggleResult: () => void;
   overGame: () => void;
@@ -27,10 +53,15 @@ type TStore = {
   togglePunctuation: () => void;
   setTime: (time: number) => void;
   setWordCount: (wordCount: number) => void;
-  setResult: (result: IResult | null) => void;
+  setResult: () => void;
+  getGraphData: () => void;
 };
 
 const useGameStore = create<TStore>()((set, get) => ({
+  errors: {},
+  startTime: 0,
+  isTypingStarted: false,
+  wordTimingMap: null,
   actual: "",
   isFocused: false,
   cases: false,
@@ -43,15 +74,24 @@ const useGameStore = create<TStore>()((set, get) => ({
   wordCount: 20,
   isGameOver: false,
   resultShown: false,
+  graphData: null,
+  setErrors: (errors) => set({ errors }),
+  setStartTime: (startTime) => set({ startTime }),
+  toggleIsTypingStarted: () => set({ isTypingStarted: !get().isTypingStarted }),
   setActual: (actual) => set({ actual }),
+  setWordTimingMap: (startTime, timingMap) => set({ wordTimingMap: timingMap }),
   toggleResult: () => set({ resultShown: !get().resultShown }),
   overGame: () => set({ isGameOver: true }),
   restartGame: () => set({ isGameOver: false }),
   toggleIsFocused: () => set({ isFocused: !get().isFocused }),
   setTime: (time) => set({ time }),
-  setResult: (result) => {
-    console.log(result);
-    set({ result });
+  setResult: () => {
+    const { matter, actual, time } = get();
+    const wpm = calcWPM(time, actual, matter);
+    const raw = calcRaw(time, actual);
+    const acc = calcAccuracy(actual, matter);
+    const errors = calcErrors(actual, matter);
+    set({ result: { time, wpm, raw, acc, errors } });
   },
   toggleCases: () => set({ cases: !get().cases }),
   toggleNumber: () => set({ number: !get().number }),
@@ -67,6 +107,16 @@ const useGameStore = create<TStore>()((set, get) => ({
     else configs.min = time * 5;
 
     set({ matter: genMatter(configs) });
+  },
+  getGraphData: () => {
+    const { startTime, time, wordTimingMap, errors, matter, result } = get();
+    if (!result || !wordTimingMap) return;
+    const testTime = getNumArr(time);
+    const wpmSpeeds = getWpmSpeed(startTime, wordTimingMap, matter);
+    const rawSpeeds = getRawSpeed(startTime, wordTimingMap);
+    const errorIndexes = getErrors(startTime, errors);
+    console.log({ testTime, wpmSpeeds, rawSpeeds, errorIndexes });
+    set({ graphData: { testTime, wpmSpeeds, rawSpeeds, errorIndexes } });
   },
 }));
 

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 
 const Timer = () => {
-  const { mode, time, isFocused, matter, toggleResult } = useGameStore();
+  const { mode, time, isFocused,isTypingStarted, matter, toggleResult } = useGameStore();
+
   const [timeLeft, setTimeLeft] = useState(time);
 
   // reset time
@@ -11,7 +12,7 @@ const Timer = () => {
   }, [matter]);
 
   useEffect(() => {
-    if (!isFocused || mode !== "time") return;
+    if (!isFocused || mode !== "time" || !isTypingStarted) return;
     if (timeLeft === 0) {
       toggleResult();
       return;
@@ -26,7 +27,7 @@ const Timer = () => {
         clearInterval(timer);
       };
     }
-  }, [isFocused, timeLeft, mode, toggleResult]);
+  }, [isFocused, timeLeft, mode,isTypingStarted, toggleResult]);
 
   if (mode === "words") return null;
 

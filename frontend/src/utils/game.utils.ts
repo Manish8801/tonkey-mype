@@ -2,6 +2,7 @@ import { generate } from "random-words";
 import { IGenConfigs } from "../types/type";
 const { round, random, floor } = Math;
 
+// get and set the positions for the caret
 function getOffsets(elem: HTMLElement) {
   const x = round(elem.offsetLeft);
   const y = round(elem.offsetTop);
@@ -16,6 +17,7 @@ function placeCaret(
     caretElem.style.top = y + "px";
   }
 }
+// style letter wrong, correct or rest
 function resetStyle(elem: HTMLElement) {
   if (elem) {
     elem.style.color = "";
@@ -31,15 +33,7 @@ function styleWrong(elem: HTMLElement) {
 function styleCorrect(elem: HTMLElement) {
   if (elem) elem.style.color = "#d1d0c5";
 }
-function getNumerics() {
-  const randLength = floor(1 + random() * 6);
-  let numStr = "";
-  for (let i = 0; i <= randLength; i++) {
-    const num = floor(0 + random() * 10);
-    numStr += `${num}`;
-  }
-  return numStr;
-}
+// get random punctuation
 function getPunctuation() {
   const punctuations = [
     `"`,
@@ -61,43 +55,47 @@ function getPunctuation() {
 
   return punctuations[0 + floor(random() * punctuations.length)];
 }
+
+// result calc functions
 function calcWPM(time: number, actual: string, expected: string) {
   let correct = 0;
-  const [actualWords, expectedWords] = [actual.split(" "), expected.split(" ")];
+  const [actualWords, expectedWords] = [
+    actual.split(" "),
+    expected.slice(0, actual.length).split(" "),
+  ];
   for (let i = 0; i < actualWords.length; i++) {
     if (expectedWords[i] === actualWords[i]) correct++;
   }
-
-  return (60 / time) * correct;
+  return (60 / time) * correct || 0;
 }
 function calcAccuracy(actual: string, expected: string) {
   let correct = 0;
-  const [actualWords, expectedWords] = [actual.split(" "), expected.split(" ")];
-  for (let i = 0; i < actualWords.length; i++) {
-    if (expectedWords[i] === actualWords[i]) correct++;
+  const [actualArr, expectedArr] = [
+    actual.replaceAll(" ", ""),
+    expected.slice(0, actual.length).replaceAll(" ", ""),
+  ];
+  for (let i = 0; i < actualArr.length; i++) {
+    if (expectedArr[i] === actualArr[i]) correct++;
   }
-  const final = (correct / actualWords.length) * correct;
-  console.log(final);
-  return final;
+  return round((correct / actualArr.length) * 100) || 0;
 }
 function calcErrors(actual: string, expected: string) {
   const errors: { [key: string]: number[] } = {};
   const [actualWords, expectedWords] = [
     actual.replaceAll(" ", ""),
-    expected.replaceAll(" ", ""),
+    expected.slice(0, actual.length).replaceAll(" ", ""),
   ];
 
   for (let i = 0; i < actualWords.length; i++) {
-    console.log(actualWords[i], expectedWords[i]);
     if (actualWords[i] !== expectedWords[i]) {
-      if (actualWords[i] in errors) errors[actualWords[i]].push(i);
-      else errors[actualWords[i]] = [i];
+      if (expectedWords[i] in errors) errors[expectedWords[i]].push(i);
+      else errors[expectedWords[i]] = [i];
     }
   }
-  const final = errors;
-  console.log(final);
-  return final;
+  return errors;
 }
+
+// get data for chart
 function getErrArr(errors: { [key: string]: number[] }) {
   const values: number[][] = Object.values(errors);
   let arr: number[] = [];
@@ -108,9 +106,17 @@ function getErrArr(errors: { [key: string]: number[] }) {
   }
   return arr;
 }
+function getNumerics() {
+  const randLength = floor(1 + random() * 6);
+  let numStr = "";
+  for (let i = 0; i <= randLength; i++) {
+    const num = floor(0 + random() * 10);
+    numStr += `${num}`;
+  }
+  return numStr;
+}
 function calcRaw(time: number, actual: string) {
   const final = round(60 / time) * actual.split(" ").length;
-  console.log(final);
   return final;
 }
 function genMatter({

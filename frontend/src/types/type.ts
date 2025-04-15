@@ -49,8 +49,14 @@ export interface IGenConfigs {
 
 export interface IResult {
   wpm: number;
-  accuracy: number;
+  acc: number;
   raw: number;
   time: number;
   errors: Record<string, number[]>;
-};
+}
+export interface IGraphData {
+  testTime: number[];
+  wpmSpeeds: number[];
+  rawSpeeds: number[];
+  errorIndexes: number[];
+}

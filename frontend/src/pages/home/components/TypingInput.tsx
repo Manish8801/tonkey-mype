@@ -20,12 +20,17 @@ const TypingInput = () => {
     number,
     punctuation,
     cases,
-    mode, 
+    mode,
+    setErrors,
+    setStartTime,
     setActual,
     overGame,
     genMatter,
     toggleIsFocused,
+    setWordTimingMap,
+    toggleIsTypingStarted,
   } = useGameStore();
+  const timingsOfWordCompleted = useRef<{ [key: string]: number }>({});
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const paragraphRef = useRef<HTMLDivElement | null>(null);
   const caretRef = useRef<HTMLDivElement | null>(null);
@@ -33,6 +38,8 @@ const TypingInput = () => {
   const lastCorrectIndex = useRef<number>(0);
   const value = useRef<string>("");
   const yCoordFirstLine = useRef<number>(0);
+  const startTime = useRef<number>(0);
+  const errors = useRef<{ [key: string]: number }>({});
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
@@ -41,6 +48,12 @@ const TypingInput = () => {
       e.preventDefault();
       e.target.value = value.current;
       return;
+    }
+
+    if (startTime.current === 0) {
+      startTime.current = Math.round(performance.now());
+
+      toggleIsTypingStarted();
     }
 
     value.current = e.target.value;
@@ -59,6 +72,7 @@ const TypingInput = () => {
       }
     } else {
       styleWrong(charRefs.current[valueLength - 1]!);
+      errors.current[valueLength - 1] = performance.now();
     }
 
     if (valueLength === 0) {
@@ -89,6 +103,16 @@ const TypingInput = () => {
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
     }
   };
+  useEffect(() => {
+    genMatter();
+
+    return () => {
+      setStartTime(startTime.current);
+      setActual(value.current.trim());
+      setWordTimingMap(startTime.current, timingsOfWordCompleted.current);
+      setErrors(errors.current);
+    };
+  }, []);
 
   // don't touch it
   useEffect(() => {
@@ -97,25 +121,25 @@ const TypingInput = () => {
 
   useEffect(() => {
     genMatter();
-    return () => setActual(value.current.trim());
-  }, []);
+  }, [mode, time, wordCount, number, punctuation, cases]);
 
   useEffect(() => {
-    genMatter();
-  }, [mode, time, wordCount, number, punctuation, cases]);
-  
-  useEffect(() => {
+    // reset the values
     if (inputRef.current) inputRef.current.value = "";
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
-    charRefs.current.forEach((span) => {
-      if (span) resetStyle(span);
-    });
+    lastCorrectIndex.current = 0;
+    startTime.current = 0;
+    timingsOfWordCompleted.current = {};
 
+    // reset the styles
     if (charRefs.current[0]) {
       const { x, y } = getOffsets(charRefs.current[0]);
       yCoordFirstLine.current = y;
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
     }
+    charRefs.current?.forEach((span) => {
+      if (span) resetStyle(span);
+    });
   }, [matter]);
   return (
     <div className="flex flex-col justify-between">
@@ -183,9 +207,7 @@ const TypingInput = () => {
         </button>
       </div>
       <input
-        onBlur={() => {
-          if (isFocused) toggleIsFocused();
-        }}
+        onBlur={() => toggleIsFocused()}
         type="text"
         id="typing-input"
         className="size-0"
@@ -196,6 +218,9 @@ const TypingInput = () => {
           if (!isFocused) {
             e.preventDefault();
             return;
+          }
+          if (e.ctrlKey && e.key === "Backspace") {
+            e.preventDefault();
           }
           if (
             ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
@@ -210,6 +235,11 @@ const TypingInput = () => {
             e.preventDefault();
             return;
           }
+          if (e.code === "Space") {
+            const splitValue = value.current.split(" ");
+            timingsOfWordCompleted.current[splitValue[splitValue.length - 1]] =
+              Math.round(performance.now());
+          }
         }}
       />
     </div>
@@ -217,102 +247,3 @@ const TypingInput = () => {
 };
 
 export default TypingInput;
-
-// return (
-//   <main className="flex-1 flex flex-col gap-10">
-//     <TypingInput />
-//     <div className="flex items-center flex-col gap-6 text-content-secondary">
-//       <div className="flex items-center gap-1.5 text-sm font-roboto font-semibold hover:text-content-primary duration-200 cursor-pointer">
-//         <FaEarthAmericas className="text-lg" />
-//         english
-//       </div>
-//       {mode === "time" && (
-//         <div className="place-self-start text-content-main text-3xl">
-//           {time}
-//         </div>
-//       )}
-//       <div
-//         className={`relative font-roboto`}
-//         tabIndex={0}
-//         onFocus={() => toggleIsFocused(true)}
-//       >
-//         <div
-//           className={`relative h-[145px] overflow-y-hidden ${
-//             !isFocused ? "blur-[10px]" : ""
-//           } ] text-left select-none scroll-smooth`}
-//           ref={paragraphRef}
-//         >
-//           {matter &&
-//             [...matter.split(""), " "].map((char, index) => (
-//               <span
-//                 style={{
-//                   borderBottomWidth: "2px",
-//                   borderBottomStyle: "solid",
-//                   borderColor: "transparent",
-//                 }}
-//                 className={`leading-[50px] duration-100 ease-in text-[30px]`}
-//                 key={index}
-//                 ref={(e) => {
-//                   charRefs.current[index] = e;
-//                 }}
-//               >
-//                 {char}
-//               </span>
-//             ))}
-//           <div
-//             ref={caretRef}
-//             className={`duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
-//           />
-//         </div>
-//         {!isFocused && (
-//           <div
-//             className="select-none absolute cursor-default top-1/3 left-1/2 -translate-x-1/2 text-base flex items-center justify-center gap-1 text-content-primary"
-//             onClick={() => toggleIsFocused(true)}
-//           >
-//             <GiArrowCursor />
-//             Click here or press any where to focus
-//           </div>
-//         )}
-//       </div>
-
-//       <button
-//         onClick={(e) => {
-//           genMatter();
-//           toggleIsFocused(true);
-
-//           const prevRotation = parseInt(e.currentTarget.style.rotate);
-//           e.currentTarget.style.rotate = (prevRotation || 0) + 360 + "deg";
-//         }}
-//         className="button hover:text-content-primary duration-200 text-lg ease-linear cursor-pointer"
-//       >
-//         <GrRefresh />
-//       </button>
-//     </div>
-//     <input
-//       onBlur={() => {
-//         if (isFocused) toggleIsFocused(false);
-//       }}
-//       type="text"
-//       id="typing-input"
-//       className="size-0"
-//       autoComplete="off"
-//       ref={inputRef}
-//       onChange={handleInputChange}
-//       onKeyDown={(e) => {
-//         if (
-//           ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
-//         ) {
-//           e.preventDefault();
-//           return;
-//         }
-//         if (
-//           e.key === "Backspace" &&
-//           lastCorrectIndex.current === value.current.length
-//         ) {
-//           e.preventDefault();
-//           return;
-//         }
-//       }}
-//     />
-//   </main>
-// );
