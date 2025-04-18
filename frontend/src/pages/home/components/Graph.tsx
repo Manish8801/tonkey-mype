@@ -1,69 +1,56 @@
 import { Line } from "react-chartjs-2";
-import {
-  Filler,
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Chart, registerables } from "chart.js";
 import useGameStore from "../../../zustand/useGameStore";
+import { getNumArr } from "../../../utils/helper";
 
-ChartJS.register(
-  Filler,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+Chart.register(...registerables);
 
 const Graph = () => {
-  const { graphData } = useGameStore();
-  const timeData = graphData?.testTime || [];
-  const wpmData = graphData?.wpmSpeeds || [];
-  const rawData = graphData?.rawSpeeds || [];
-  const errorsData = graphData?.errorIndexes || [];
+  const { result, session } = useGameStore();
+  const seconds = getNumArr(session);
+  const errorsCountArr = result?.errorsCountArr || [];
+  const errors =
+    result?.errorsCountArr.map((item) => (item !== null ? item[0] : null)) ||
+    [];
+  const wpm = result?.wpmSpeed || [];
+  const raw = result?.rawSpeed || [];
+
+  console.log(errors);
 
   const data = {
-    labels: timeData, // x-axis time in seconds
+    labels: seconds, // x-axis time in seconds
     datasets: [
       {
         label: "Errors",
+        data: errors,
+        borderColor: "#FF5733",
+        yAxisId: "y1",
+        showLine: false,
         pointStyle: "crossRot",
         pointRadius: 3,
         borderWidth: 2,
-        showLine: false,
-        borderColor: "#FF5733",
         pointBackgroundColor: "#ff5733",
-        data: errorsData,
-        yAxisId: "y1",
       },
       {
-        tension: 0.4,
         label: "WPM",
+        data: wpm,
         borderColor: "#e2b714",
-        backgroundColor: "rgba(0,0,0,.3)",
-        pointBackgroundColor: "#e2b714",
         yAxisId: "y",
-        data: wpmData,
+        tension: 0.4,
+        pointBackgroundColor: "#e2b714",
+        borderWidth: 2,
       },
       {
         label: "Raw",
+        data: raw,
+        borderColor: "#646669",
         yAxisId: "y",
         fill: true,
         tension: 0.4,
-        boxPadding: 0,
-        borderColor: "#646669",
         backgroundColor: "rgba(0,0,0,.3)",
         usePointStyle: true,
         pointBackgroundColor: "#646669",
-        data: rawData,
+        borderWidth: 2,
       },
     ],
   };
@@ -76,91 +63,70 @@ const Graph = () => {
         display: false,
       },
       tooltip: {
-        mode: "index" as const,
+        mode: "index",
         intersect: false,
         callbacks: {
           label: function (context: any) {
+            const dataIndex = context.dataIndex;
+            
             const label = context.dataset.label || "";
-            const value = context.raw || 0; // Data value
+            const value = context.raw || 0;
+            if (label === "Errors" && value && errorsCountArr[dataIndex]) {
+              
+              return `${label}: ${errorsCountArr[dataIndex].length}`
+            } 
+            
             return `${label}: ${value}`;
           },
         },
-        backgroundColor: "rgba(0, 0, 0, 0.7)", // Tooltip background color
-        titleColor: "#fff" as const, // Tooltip title text color
-        bodyColor: "#fff" as const, // Tooltip body text color
-        displayColors: true, // Show color indicators in tooltip
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        displayColors: true,
         bodyFont: {
-          weight: "bold" as const,
+          weight: "bold",
         },
       },
     },
     scales: {
-      x: {
-        type: "linear" as const,
-        title: {
-          font: {
-            weight: "bold" as const,
-            size: 16,
-            min: 1,
-          },
-          align: "center" as const,
-          display: true,
-          text: "Time (seconds)", // Label for the x-axis
-        },
-
-        ticks: {
-          minTicksLimit: 15,
-          color: "#646669",
-          font: {
-            size: 14,
-          },
-        },
-        grid: {
-          display: true,
-          color: "rgba(0,0,0,.1)",
-        },
-      },
       y: {
-        type: "linear" as const,
-        position: "left" as const,
-
+        type: "linear",
+        position: "left",
         title: {
           font: {
-            weight: "bold" as const,
+            weight: "bold",
             size: 16,
           },
-          align: "center" as const,
+          align: "center",
           display: true,
           text: "Words per minute", // Label for left y-axis
         },
         ticks: {
           maxTicksLimit: 4,
-          color: "#646669" as const,
-        },
-        grid: {
-          color: "rgba(0,0,0,.1)",
+          color: "#646669",
         },
       },
       y1: {
-        type: "linear" as const,
-        position: "right" as const,
+        grid: {
+          drawOnChartArea: false,
+        },
+        type: "linear",
+        position: "right",
         title: {
           font: {
-            weight: "bold" as const,
-            size: 16,
+            weight: "bold",
           },
-          align: "center" as const,
+          align: "center",
           display: true,
           text: "Errors",
         },
         ticks: {
-          maxTicksLimit: 2,
+          maxTicksLimit: 4,
           color: "#646669",
+          beginAtZero: true,
         },
-        grid: {
-          drawOnChartArea: false,
-          color: "rgba(0,0,0,0.1)",
-        },
+        min: 0,
+        max: Math.max(...errors.filter((item) => item !== null)),
       },
     },
   };

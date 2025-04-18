@@ -2,32 +2,31 @@ import { useEffect, useState } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 
 const Timer = () => {
-  const { mode, time, isFocused,isTypingStarted, matter, toggleResult } = useGameStore();
+  const { mode, session, isFocused, isTypingStarted, matter } =
+    useGameStore();
 
-  const [timeLeft, setTimeLeft] = useState(time);
+  const [timeLeft, setTimeLeft] = useState(session);
 
   // reset time
   useEffect(() => {
-    setTimeLeft(time);
+    setTimeLeft(session);
   }, [matter]);
 
   useEffect(() => {
-    if (!isFocused || mode !== "time" || !isTypingStarted) return;
-    if (timeLeft === 0) {
-      toggleResult();
-      return;
-    }
-
+    if (!isFocused || mode !== "session" || !isTypingStarted) return;
     let timer: NodeJS.Timeout | undefined;
-    if (timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
-      }, 1000);
+    if (timeLeft >= 1) {
+      timer = setInterval(
+        () => {
+          setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+        },
+        session ? 1000 : 0
+      );
       return () => {
         clearInterval(timer);
       };
     }
-  }, [isFocused, timeLeft, mode,isTypingStarted, toggleResult]);
+  }, [isFocused, timeLeft, mode, isTypingStarted]);
 
   if (mode === "words") return null;
 
@@ -39,9 +38,3 @@ const Timer = () => {
 };
 
 export default Timer;
-
-// reset timer whenever time or matter changes
-// If mode is time only then show the timer -- done
-// if typing input is focused and time left only then play the timer
-// once the timer finishes navigate show result section
-// if users comeback set every thing to default

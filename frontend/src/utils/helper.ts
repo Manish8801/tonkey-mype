@@ -45,6 +45,7 @@ function getRawSpeed(
     return Math.round((duration / 1000) * 60);
   });
 }
+
 function getErrors(
   startTime: number,
   errors: { [key: string]: number }
@@ -52,4 +53,37 @@ function getErrors(
   const timings: number[] = Object.values(errors);
   return timings.map((timing) => Math.round(timing));
 }
-export { formatTime, getNumArr, getWpmSpeed, getRawSpeed, getErrors };
+
+function fillGaps(data: number[][], session: number) {
+  const filledData = [];
+  for (let i = 1; i <= session; i++) {
+    const found = data.find((item) => item[0] === i);
+    filledData.push([i, found ? found[1] : 0]);
+  }
+  return filledData;
+}
+
+function compareString(actual: string, original: string) {
+  let correctCount = 0;
+  let incorrectCount = 0;
+  const errorIndexes: number[] = [];
+
+  for (let i = 0; i < actual.length; i++) {
+    if (actual[i] === original[i]) correctCount++;
+    else {
+      errorIndexes.push(i);
+      incorrectCount++;
+    }
+  }
+
+  return { correctCount, incorrectCount, errorIndexes };
+}
+export {
+  formatTime,
+  getNumArr,
+  getWpmSpeed,
+  getRawSpeed,
+  getErrors,
+  fillGaps,
+  compareString,
+};

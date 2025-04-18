@@ -11,13 +11,13 @@ const TypingSetting = () => {
     mode,
     number,
     punctuation,
-    time,
+    session,
     wordCount,
     toggleCases,
     genMatter,
-    setTime,
+    setSession,
     setWordCount,
-    toggleMode,
+    setMode,
     toggleNumber,
     togglePunctuation,
   } = useGameStore();
@@ -26,7 +26,7 @@ const TypingSetting = () => {
 
   useEffect(() => {
     genMatter();
-  }, [number, punctuation, cases, mode, time, wordCount, genMatter]);
+  }, [number, punctuation, cases, mode, session, wordCount, genMatter]);
 
   return (
     <div className="bg-[rgba(0,0,0,.13)] text-config flex items-center justify-center mx-auto px-4 C w-fit rounded-lg text-content-secondary  leading-4">
@@ -75,9 +75,9 @@ const TypingSetting = () => {
         />
         <button
           className={`py-2.5 flex items-center justify-center gap-0.5 ${
-            mode === "time" ? "text-content-main" : "hover:text-content-primary"
+            mode === "session" ? "text-content-main" : "hover:text-content-primary"
           } duration-200 ease-out`}
-          onClick={() => toggleMode()}
+          onClick={() => setMode("session")}
         >
           <FaClock className="sm:text-sm md:text-base" />
           <div className="font-semibold">time</div>
@@ -88,7 +88,7 @@ const TypingSetting = () => {
               ? "text-content-main"
               : "hover:text-content-primary"
           } duration-200 ease-out`}
-          onClick={() => toggleMode()}
+          onClick={() => setMode("words")}
         >
           <FaFont className="sm:text-sm md:text-base" />
           <div className="font-semibold">words</div>
@@ -100,64 +100,64 @@ const TypingSetting = () => {
         />
         <button
           className={`${
-            (mode === "time" && time === 15) ||
+            (mode === "session" && session === 10) ||
             (mode === "words" && wordCount === 10)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           }  ease-out font-semibold`}
           onClick={() => {
-            if (mode === "time") setTime(15);
+            if (mode === "session") setSession(15);
             else setWordCount(10);
           }}
         >
-          {mode === "time" ? 15 : 10}
+          {mode === "session" ? 15 : 10}
         </button>
         <button
           className={`${
-            (mode === "time" && time === 30) ||
+            (mode === "session" && session === 30) ||
             (mode === "words" && wordCount === 20)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           }  ease-out font-semibold`}
           onClick={() => {
-            if (mode === "time") setTime(30);
+            if (mode === "session") setSession(30);
             setWordCount(20);
           }}
         >
-          {mode === "time" ? 30 : 20}
+          {mode === "session" ? 30 : 20}
         </button>
         <button
           className={`${
-            (mode === "time" && time === 60) ||
+            (mode === "session" && session === 60) ||
             (mode === "words" && wordCount === 50)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           } ease-out font-semibold`}
           onClick={() => {
-            if (mode === "time") setTime(60);
+            if (mode === "session") setSession(60);
             setWordCount(50);
           }}
         >
-          {mode === "time" ? 60 : 50}
+          {mode === "session" ? 60 : 50}
         </button>
         <button
           className={`${
-            (mode === "time" && time === 120) ||
+            (mode === "session" && session === 120) ||
             (mode === "words" && wordCount === 100)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"
           } ease-out font-semibold`}
           onClick={() => {
-            if (mode === "time") setTime(120);
+            if (mode === "session") setSession(120);
             setWordCount(100);
           }}
         >
-          {mode === "time" ? 120 : 100}
+          {mode === "session" ? 120 : 100}
         </button>
         <button
           className="sm:text-sm md:text-base hover:text-content-primary duration-200 ease-out"
           onClick={() => {
-            if (mode === "time") toggleDurationDialog();
+            if (mode === "session") toggleDurationDialog();
             if (mode === "words") toggleWordCountDialog();
           }}
         >

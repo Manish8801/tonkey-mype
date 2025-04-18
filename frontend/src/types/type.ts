@@ -51,12 +51,11 @@ export interface IResult {
   wpm: number;
   acc: number;
   raw: number;
-  time: number;
-  errors: Record<string, number[]>;
+  errorsCountArr: (number[] | null)[];
+  rawSpeed: number[];
+  wpmSpeed: number[];
 }
 export interface IGraphData {
-  testTime: number[];
-  wpmSpeeds: number[];
-  rawSpeeds: number[];
-  errorIndexes: number[];
+  wpmSpeed: number[];
+  rawSpeed: number[];
 }

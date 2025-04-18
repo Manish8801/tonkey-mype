@@ -1,17 +1,9 @@
-import { useEffect } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 import Graph from "./Graph";
 import { FaCrown } from "react-icons/fa";
 
 const Result = () => {
-  const { setResult, number, punctuation, cases, result, time, getGraphData } =
-    useGameStore();
-
-  useEffect(() => {
-    setResult();
-    getGraphData();
-  }, []);
-
+  const { number, punctuation, cases, result, session } = useGameStore();
   return (
     <div className="flex-1 grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
       {/* first row */}
@@ -30,7 +22,7 @@ const Result = () => {
         <div>
           <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
           <div className="text-content-main text-5xl sm:text-6xl">
-            {result?.acc}%
+            {result?.acc||0}%
           </div>
         </div>
       </div>
@@ -40,7 +32,7 @@ const Result = () => {
       {/* second row */}
       <div className="justify-self-center md:justify-self-auto font-lexend">
         <div className="text-content-secondary">test type</div>
-        <div className="text-content-main ">time {time}</div>
+        <div className="text-content-main ">time {session}</div>
         <div className="text-content-main ">english</div>
         {cases && <div className="text-content-main ">cases</div>}
         {number && <div className="text-content-main ">number</div>}
@@ -62,7 +54,7 @@ const Result = () => {
           </div>
           <div>
             <div className="text-content-secondary text-base">time</div>
-            <div className="text-content-main text-3xl">15s</div>
+            <div className="text-content-main text-3xl">{session}s</div>
             <div className="text-[10px] text-content-secondary tracking-wider">
               00:00:15 session
             </div>
@@ -74,30 +66,4 @@ const Result = () => {
 };
 
 export default Result;
-//  <div className="flex flex-wrap w-full font-roboto gap-4">
-//       {/* mota result */}
-//       <div className="w-fit bg-gray-200">
-//         <div className="">
-//           <div className="text-content-secondary text-3xl sm:text-4xl flex gap-2 items-center justify-between">
-//             wpm
-//             <div className="bg-content-main text-base-primary inline-block text-xs sm:text-base p-1.5 rounded-full">
-//               <FaCrown className="" />
-//             </div>
-//           </div>
-//           <div className="text-content-main text-5xl sm:text-6xl">56</div>
-//         </div>
-//         <div className="">
-//           <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
-//           <div className="text-content-main text-5xl sm:text-6xl">98%</div>
-//         </div>
-//       </div>
-//       {/* graph */}
-//       <Graph />
-//       {/* text-type */}
-//       <div className="w-fit">
-//
-//       </div>
-//       {/* details */}
 
-//
-//     </div>

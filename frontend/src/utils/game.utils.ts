@@ -1,5 +1,6 @@
 import { generate } from "random-words";
 import { IGenConfigs } from "../types/type";
+import { compareString } from "./helper";
 const { round, random, floor } = Math;
 
 // get and set the positions for the caret
@@ -55,46 +56,6 @@ function getPunctuation() {
 
   return punctuations[0 + floor(random() * punctuations.length)];
 }
-
-// result calc functions
-function calcWPM(time: number, actual: string, expected: string) {
-  let correct = 0;
-  const [actualWords, expectedWords] = [
-    actual.split(" "),
-    expected.slice(0, actual.length).split(" "),
-  ];
-  for (let i = 0; i < actualWords.length; i++) {
-    if (expectedWords[i] === actualWords[i]) correct++;
-  }
-  return (60 / time) * correct || 0;
-}
-function calcAccuracy(actual: string, expected: string) {
-  let correct = 0;
-  const [actualArr, expectedArr] = [
-    actual.replaceAll(" ", ""),
-    expected.slice(0, actual.length).replaceAll(" ", ""),
-  ];
-  for (let i = 0; i < actualArr.length; i++) {
-    if (expectedArr[i] === actualArr[i]) correct++;
-  }
-  return round((correct / actualArr.length) * 100) || 0;
-}
-function calcErrors(actual: string, expected: string) {
-  const errors: { [key: string]: number[] } = {};
-  const [actualWords, expectedWords] = [
-    actual.replaceAll(" ", ""),
-    expected.slice(0, actual.length).replaceAll(" ", ""),
-  ];
-
-  for (let i = 0; i < actualWords.length; i++) {
-    if (actualWords[i] !== expectedWords[i]) {
-      if (expectedWords[i] in errors) errors[expectedWords[i]].push(i);
-      else errors[expectedWords[i]] = [i];
-    }
-  }
-  return errors;
-}
-
 // get data for chart
 function getErrArr(errors: { [key: string]: number[] }) {
   const values: number[][] = Object.values(errors);
@@ -114,10 +75,6 @@ function getNumerics() {
     numStr += `${num}`;
   }
   return numStr;
-}
-function calcRaw(time: number, actual: string) {
-  const final = round(60 / time) * actual.split(" ").length;
-  return final;
 }
 function genMatter({
   number = false,
@@ -147,12 +104,68 @@ function genMatter({
   }
   return join ? final.join(join) : final.join(" ");
 }
+function getResult(valuePerSecond: string[], matter: string) {
+  const seconds = valuePerSecond.length;
+  const timeInMinutes = 60 / seconds;
+  const last = valuePerSecond[valuePerSecond.length - 1];
+  // const words = last.split(" ");
+  // const avgWordLength =
+  //   words.reduce((acc, curr) => acc + curr.length, 0) / words.length;
+
+  // speed
+  const wpmSpeed: number[] = [];
+  const rawSpeed: number[] = [];
+  const errorsCountArr: (number[] | null)[] = [];
+
+  let lastCheckedStringLength: number = 0;
+  let totalCorrectChars = 0;
+  valuePerSecond.forEach((value) => {
+    // newly typed value at each second
+    const stringToCheck = value.slice(lastCheckedStringLength);
+
+    // get correct and incorrect chars count
+    const { correctCount, incorrectCount, errorIndexes } = compareString(
+      stringToCheck,
+      matter.slice(lastCheckedStringLength)
+    );
+
+    // second : errorCounts
+    const actualErrorIndexes = errorIndexes.map(
+      (index) => index + lastCheckedStringLength
+    );
+    errorsCountArr.push(actualErrorIndexes || null);
+
+    // calculating speed
+    wpmSpeed.push(
+      Math.floor(
+        correctCount === 0
+          ? (wpmSpeed[wpmSpeed.length - 1] * 60) / 100
+          : Math.floor((correctCount / 5) * timeInMinutes) * 60
+      )
+    );
+    rawSpeed.push(
+      Math.floor(
+        stringToCheck.length === 0
+          ? (rawSpeed[rawSpeed.length - 1] * 60) / 100
+          :  Math.floor((stringToCheck.length / 5) * timeInMinutes) * 60
+      )
+    );
+
+    totalCorrectChars += correctCount;
+
+    lastCheckedStringLength = value.length;
+    return [correctCount, stringToCheck.length, incorrectCount];
+  });
+
+  const wpm = Math.floor((totalCorrectChars / 5) * timeInMinutes);
+  const raw = Math.floor((last.length / 5) * timeInMinutes);
+  const acc = Math.floor((wpm * 100) / raw);
+
+  return { acc, wpm, raw, rawSpeed, wpmSpeed, errorsCountArr };
+}
 
 export {
-  calcWPM,
-  calcAccuracy,
-  calcErrors,
-  calcRaw,
+  getResult,
   genMatter,
   getOffsets,
   placeCaret,

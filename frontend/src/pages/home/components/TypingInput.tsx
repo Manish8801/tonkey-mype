@@ -11,26 +11,25 @@ import {
 import { FaEarthAmericas } from "react-icons/fa6";
 import { GiArrowCursor } from "react-icons/gi";
 import { GrRefresh } from "react-icons/gr";
+import TypingSetting from "./TypingSetting";
+
 const TypingInput = () => {
   const {
+    isTypingStarted,
     matter,
     isFocused,
-    time,
+    session,
     wordCount,
     number,
     punctuation,
     cases,
     mode,
-    setErrors,
-    setStartTime,
-    setActual,
-    overGame,
+    setResult,
+    showResult,
     genMatter,
     toggleIsFocused,
-    setWordTimingMap,
     toggleIsTypingStarted,
   } = useGameStore();
-  const timingsOfWordCompleted = useRef<{ [key: string]: number }>({});
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const paragraphRef = useRef<HTMLDivElement | null>(null);
   const caretRef = useRef<HTMLDivElement | null>(null);
@@ -39,12 +38,12 @@ const TypingInput = () => {
   const value = useRef<string>("");
   const yCoordFirstLine = useRef<number>(0);
   const startTime = useRef<number>(0);
-  const errors = useRef<{ [key: string]: number }>({});
+  const valuePerSecond = useRef<string[]>([]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
+    // if value length is greater than or equal length of matter
     if (valueLength >= paragraphRef.current!.children.length + 1) {
-      overGame();
       e.preventDefault();
       e.target.value = value.current;
       return;
@@ -52,33 +51,38 @@ const TypingInput = () => {
 
     if (startTime.current === 0) {
       startTime.current = Math.round(performance.now());
-
       toggleIsTypingStarted();
     }
 
     value.current = e.target.value;
-
     if (valueLength === 0) {
       const { x, y } = getOffsets(charRefs.current[0]!);
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
       resetStyle(charRefs.current[0]!);
     }
+
+    // last char typed
     const lastCharTyped = value.current[valueLength - 1];
 
     if (lastCharTyped === charRefs.current[valueLength - 1]?.textContent) {
+      // if it's correct
       styleCorrect(charRefs.current[valueLength - 1]!);
       if (charRefs.current[valueLength - 1]?.textContent !== " ") {
+        // the index of last correct char
         lastCorrectIndex.current = valueLength;
       }
     } else {
+      // if wrong otherwise
       styleWrong(charRefs.current[valueLength - 1]!);
-      errors.current[valueLength - 1] = performance.now();
     }
 
     if (valueLength === 0) {
+      // if there's no value
       resetStyle(charRefs.current[0]!);
-      lastCorrectIndex.current = valueLength;
+      // then the index of last correct char is zero
+      lastCorrectIndex.current = 0;
     } else {
+      // if not zero reset the style of next char
       resetStyle(charRefs.current[valueLength]!);
     }
 
@@ -103,16 +107,23 @@ const TypingInput = () => {
       if (caretRef.current) placeCaret(caretRef.current, { x, y });
     }
   };
-  useEffect(() => {
-    genMatter();
 
-    return () => {
-      setStartTime(startTime.current);
-      setActual(value.current.trim());
-      setWordTimingMap(startTime.current, timingsOfWordCompleted.current);
-      setErrors(errors.current);
-    };
-  }, []);
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    let elapsed = 0;
+
+    if (isTypingStarted) {
+      timer = setInterval(() => {
+        if (mode === "session" && elapsed === session) {
+          setResult(valuePerSecond.current);
+          showResult();
+          clearInterval(timer);
+        }
+        if (isFocused) elapsed++;
+        valuePerSecond.current.push(value.current);
+      }, 1000);
+    }
+  }, [isTypingStarted, isFocused, session]);
 
   // don't touch it
   useEffect(() => {
@@ -121,7 +132,7 @@ const TypingInput = () => {
 
   useEffect(() => {
     genMatter();
-  }, [mode, time, wordCount, number, punctuation, cases]);
+  }, [mode, session, wordCount, number, punctuation, cases]);
 
   useEffect(() => {
     // reset the values
@@ -129,7 +140,6 @@ const TypingInput = () => {
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
     lastCorrectIndex.current = 0;
     startTime.current = 0;
-    timingsOfWordCompleted.current = {};
 
     // reset the styles
     if (charRefs.current[0]) {
@@ -144,6 +154,7 @@ const TypingInput = () => {
   return (
     <div className="flex flex-col justify-between">
       <div className="flex items-center flex-col gap-6 text-content-secondary">
+        <TypingSetting />
         <div className="flex items-center gap-1.5 text-sm font-roboto font-semibold hover:text-content-primary duration-200 cursor-pointer">
           <FaEarthAmericas className="text-lg" />
           english
@@ -179,7 +190,7 @@ const TypingInput = () => {
               ))}
             <div
               ref={caretRef}
-              className={`duration-100 delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
+              className={`duration-[90ms] delay-0 bg-content-main absolute h-10 w-[3.5px] ease-linear rounded-full`}
             />
           </div>
           {!isFocused && (
@@ -228,17 +239,11 @@ const TypingInput = () => {
             e.preventDefault();
             return;
           }
-          if (
-            e.key === "Backspace" &&
-            lastCorrectIndex.current === value.current.length
-          ) {
-            e.preventDefault();
-            return;
-          }
-          if (e.code === "Space") {
-            const splitValue = value.current.split(" ");
-            timingsOfWordCompleted.current[splitValue[splitValue.length - 1]] =
-              Math.round(performance.now());
+          if (e.key === "Backspace") {
+            if (lastCorrectIndex.current === value.current.length) {
+              e.preventDefault();
+              return;
+            }
           }
         }}
       />
