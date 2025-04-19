@@ -64,19 +64,18 @@ function fillGaps(data: number[][], session: number) {
 }
 
 function compareString(actual: string, original: string) {
-  let correctCount = 0;
-  let incorrectCount = 0;
-  const errorIndexes: number[] = [];
-
+  const wrongCharIndexes: number[] = [];
+  let correctCharCount = 0;
+  let wrongCharCount = 0;
   for (let i = 0; i < actual.length; i++) {
-    if (actual[i] === original[i]) correctCount++;
+    if (actual[i] === original[i]) correctCharCount++;
     else {
-      errorIndexes.push(i);
-      incorrectCount++;
+      wrongCharIndexes.push(i);
+      wrongCharCount++;
     }
   }
 
-  return { correctCount, incorrectCount, errorIndexes };
+  return { correctCharCount, wrongCharCount, wrongCharIndexes };
 }
 export {
   formatTime,

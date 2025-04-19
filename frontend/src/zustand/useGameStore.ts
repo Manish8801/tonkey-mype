@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { genMatter, getResult } from "../utils/game.utils";
-import type { IGenConfigs,  IResult } from "../types/type";
+import type { IGenConfigs, IResult } from "../types/type";
 
 type TStore = {
   errors: { [key: string]: number };

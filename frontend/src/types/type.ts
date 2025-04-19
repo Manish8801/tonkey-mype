@@ -49,11 +49,12 @@ export interface IGenConfigs {
 
 export interface IResult {
   wpm: number;
-  acc: number;
   raw: number;
-  errorsCountArr: (number[] | null)[];
-  rawSpeed: number[];
+  acc: number;
   wpmSpeed: number[];
+  rawSpeed: number[];
+  wrongCharCounts: (number | null)[];
+  firstWrongIndexes: (number | null)[];
 }
 export interface IGraphData {
   wpmSpeed: number[];

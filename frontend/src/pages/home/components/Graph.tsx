@@ -8,21 +8,18 @@ Chart.register(...registerables);
 const Graph = () => {
   const { result, session } = useGameStore();
   const seconds = getNumArr(session);
-  const errorsCountArr = result?.errorsCountArr || [];
-  const errors =
-    result?.errorsCountArr.map((item) => (item !== null ? item[0] : null)) ||
-    [];
-  const wpm = result?.wpmSpeed || [];
-  const raw = result?.rawSpeed || [];
+  const wpmSpeed = result?.wpmSpeed || [];
+  const rawSpeed = result?.rawSpeed || [];
+  const errors = result?.wrongCharCounts || [];
+  const errorIndexes = result?.firstWrongIndexes || [];
 
-  console.log(errors);
-
+  console.log(result);
   const data = {
     labels: seconds, // x-axis time in seconds
     datasets: [
       {
         label: "Errors",
-        data: errors,
+        data: errorIndexes,
         borderColor: "#FF5733",
         yAxisId: "y1",
         showLine: false,
@@ -33,7 +30,7 @@ const Graph = () => {
       },
       {
         label: "WPM",
-        data: wpm,
+        data: wpmSpeed,
         borderColor: "#e2b714",
         yAxisId: "y",
         tension: 0.4,
@@ -42,7 +39,7 @@ const Graph = () => {
       },
       {
         label: "Raw",
-        data: raw,
+        data: rawSpeed,
         borderColor: "#646669",
         yAxisId: "y",
         fill: true,
@@ -68,14 +65,13 @@ const Graph = () => {
         callbacks: {
           label: function (context: any) {
             const dataIndex = context.dataIndex;
-            
+
             const label = context.dataset.label || "";
             const value = context.raw || 0;
-            if (label === "Errors" && value && errorsCountArr[dataIndex]) {
-              
-              return `${label}: ${errorsCountArr[dataIndex].length}`
-            } 
-            
+            if (label === "Errors" && value && errors[dataIndex]) {
+              return `${label}: ${errors[dataIndex]}`;
+            }
+
             return `${label}: ${value}`;
           },
         },

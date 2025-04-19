@@ -106,62 +106,50 @@ function genMatter({
 }
 function getResult(valuePerSecond: string[], matter: string) {
   const seconds = valuePerSecond.length;
-  const timeInMinutes = 60 / seconds;
-  const last = valuePerSecond[valuePerSecond.length - 1];
-  // const words = last.split(" ");
-  // const avgWordLength =
-  //   words.reduce((acc, curr) => acc + curr.length, 0) / words.length;
 
-  // speed
+  const wrongCharCounts: (number | null)[] = [];
+  const firstWrongIndexes: (number | null)[] = [];
+
   const wpmSpeed: number[] = [];
   const rawSpeed: number[] = [];
-  const errorsCountArr: (number[] | null)[] = [];
 
-  let lastCheckedStringLength: number = 0;
-  let totalCorrectChars = 0;
-  valuePerSecond.forEach((value) => {
-    // newly typed value at each second
-    const stringToCheck = value.slice(lastCheckedStringLength);
+  valuePerSecond.forEach((value, second) => {
+    const { correctCharCount, wrongCharCount, wrongCharIndexes } =
+      compareString(value, matter.slice(0, value.length));
 
-    // get correct and incorrect chars count
-    const { correctCount, incorrectCount, errorIndexes } = compareString(
-      stringToCheck,
-      matter.slice(lastCheckedStringLength)
-    );
+    wrongCharCounts.push(wrongCharCount || null);
+    firstWrongIndexes.push(wrongCharIndexes[0] ?? null);
 
-    // second : errorCounts
-    const actualErrorIndexes = errorIndexes.map(
-      (index) => index + lastCheckedStringLength
-    );
-    errorsCountArr.push(actualErrorIndexes || null);
-
-    // calculating speed
-    wpmSpeed.push(
-      Math.floor(
-        correctCount === 0
-          ? (wpmSpeed[wpmSpeed.length - 1] * 60) / 100
-          : Math.floor((correctCount / 5) * timeInMinutes) * 60
-      )
-    );
+    wpmSpeed.push(Math.floor((correctCharCount / (5 * (second + 1))) * 60));
     rawSpeed.push(
       Math.floor(
-        stringToCheck.length === 0
-          ? (rawSpeed[rawSpeed.length - 1] * 60) / 100
-          :  Math.floor((stringToCheck.length / 5) * timeInMinutes) * 60
+        (value.length / (5 * (second + 2))) * 60 < 4
+          ? 0
+          : (value.length / (5 * (second + 2))) * 60
       )
     );
 
-    totalCorrectChars += correctCount;
-
-    lastCheckedStringLength = value.length;
-    return [correctCount, stringToCheck.length, incorrectCount];
+    const isLast = second === valuePerSecond.length - 1;
+    if (!isLast) return;
   });
 
-  const wpm = Math.floor((totalCorrectChars / 5) * timeInMinutes);
-  const raw = Math.floor((last.length / 5) * timeInMinutes);
-  const acc = Math.floor((wpm * 100) / raw);
+  const lastValue = valuePerSecond[seconds - 1];
 
-  return { acc, wpm, raw, rawSpeed, wpmSpeed, errorsCountArr };
+  const wpm = Math.floor(
+    (compareString(lastValue, matter).correctCharCount / 5) * (60 / seconds)
+  );
+  const raw = Math.floor((lastValue.length / 5) * (60 / seconds));
+  const acc = Math.floor((wpm / raw) * 100);
+
+  return {
+    wpm,
+    raw,
+    acc,
+    wpmSpeed,
+    rawSpeed,
+    wrongCharCounts,
+    firstWrongIndexes,
+  };
 }
 
 export {

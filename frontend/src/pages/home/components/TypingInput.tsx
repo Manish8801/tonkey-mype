@@ -114,10 +114,14 @@ const TypingInput = () => {
 
     if (isTypingStarted) {
       timer = setInterval(() => {
-        if (mode === "session" && elapsed === session) {
+        const isGameOver =
+          (mode === "session" && elapsed === session) ||
+          (mode === "words" && valuePerSecond.current.length === wordCount);
+        if (isGameOver) {
+          clearInterval(timer);
+          console.log(valuePerSecond.current, matter);
           setResult(valuePerSecond.current);
           showResult();
-          clearInterval(timer);
         }
         if (isFocused) elapsed++;
         valuePerSecond.current.push(value.current);
