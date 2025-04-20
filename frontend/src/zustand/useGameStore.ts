@@ -17,7 +17,7 @@ type TStore = {
   wordCount: number;
   isGameOver: boolean;
   resultShown: boolean;
-  setResult: (valuePerSecond: string[]) => void;
+  setResult: (timeInSec: number, valuePerSecond: string[]) => void;
   toggleIsTypingStarted: () => void;
   setErrors: (errors: { [key: string]: number }) => void;
   setActual: (actual: string) => void;
@@ -54,9 +54,9 @@ const useGameStore = create<TStore>()((set, get) => ({
   toggleIsTypingStarted: () => set({ isTypingStarted: !get().isTypingStarted }),
   setActual: (actual) => set({ actual }),
   showResult: () => set({ resultShown: true }),
-  setResult: (valuePerSecond) => {
+  setResult: (timeInSec, valuePerSecond) => {
     const { matter } = get();
-    set({ result: getResult(valuePerSecond, matter) });
+    set({ result: getResult(timeInSec, valuePerSecond, matter) });
   },
   overGame: () => set({ isGameOver: true }),
   restartGame: () => set({ isGameOver: false }),

@@ -1,12 +1,13 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import useGameStore from "../../zustand/useGameStore";
-import {formatTime} from "../../utils/helper";
-import useDialogStore from "../../zustand/useDialogStore";
+import useDialogStore from "../../../zustand/useDialogStore";
+import useGameStore from "../../../zustand/useGameStore";
+import { formatTime } from "../../../utils/helper";
+
 
 const SetDuration = () => {
   const { isDurationDialogOpen, toggleDurationDialog } = useDialogStore();
-  const { time, setTime } = useGameStore();
-  const [value, setValue] = useState<string>(String(time));
+  const { session, setSession } = useGameStore();
+  const [value, setValue] = useState<string>(String(session));
   const descriptionRef = useRef<HTMLDivElement | null>(null);
   const timeInSec = useRef<number>(0);
   const dialogRef = useRef<HTMLFormElement | null>(null);
@@ -18,7 +19,7 @@ const SetDuration = () => {
   };
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTime(timeInSec.current);
+    setSession(timeInSec.current);
     timeInSec.current = 0;
     toggleDurationDialog();
   };

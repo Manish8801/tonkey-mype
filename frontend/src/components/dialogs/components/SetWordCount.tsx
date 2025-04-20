@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import useDialogStore from "../../zustand/useDialogStore";
-import useGameStore from "../../zustand/useGameStore";
+import useGameStore from "../../../zustand/useGameStore";
+import useDialogStore from "../../../zustand/useDialogStore";
+
 
 const SetWordCount = () => {
   const { isWordCountDialogOpen, toggleWordCountDialog } = useDialogStore();

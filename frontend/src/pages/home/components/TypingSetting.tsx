@@ -20,10 +20,18 @@ const TypingSetting = () => {
     setMode,
     toggleNumber,
     togglePunctuation,
+    matter,
   } = useGameStore();
 
   const { toggleDurationDialog, toggleWordCountDialog } = useDialogStore();
 
+  useEffect(() => {
+    console.log("setting rendered");
+  }, []);
+  useEffect(() => {
+    setSession(15);
+    setMode(mode);
+  }, [matter]);
   useEffect(() => {
     genMatter();
   }, [number, punctuation, cases, mode, session, wordCount, genMatter]);
@@ -61,13 +69,11 @@ const TypingSetting = () => {
         <button
           className={`${
             cases ? "text-content-main" : "hover:text-content-primary"
-          } gap-1 py-2.5 flex justify-center hover:text-content-primary duration-200 ease-out`}
+          } gap-1 py-2.5 flex justify-center items-center hover:text-content-primary duration-200 ease-out`}
           onClick={() => toggleCases()}
         >
-          <div className="relative z-auto top-[.5px] sm:text-xs md:text-sm font-semibold">
-            Aa
-          </div>
-          <div className="font-semibold pb-1 bg">Cases</div>
+          <span className="relative z-auto top-[.5px] sm:text-xs md:text-sm font-semibold">Aa</span>
+          <span className="font-semibold">Cases</span> 
         </button>
         <div
           className="h-7 rounded-full sm:w-[2px] md:w-[3px] lg:w-[4px] bg-base-primary"
@@ -75,7 +81,9 @@ const TypingSetting = () => {
         />
         <button
           className={`py-2.5 flex items-center justify-center gap-0.5 ${
-            mode === "session" ? "text-content-main" : "hover:text-content-primary"
+            mode === "session"
+              ? "text-content-main"
+              : "hover:text-content-primary"
           } duration-200 ease-out`}
           onClick={() => setMode("session")}
         >

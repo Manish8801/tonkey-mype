@@ -48,6 +48,7 @@ export interface IGenConfigs {
 }
 
 export interface IResult {
+  timeInSec: number;
   wpm: number;
   raw: number;
   acc: number;

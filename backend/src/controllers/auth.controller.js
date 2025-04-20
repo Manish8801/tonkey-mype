@@ -121,8 +121,6 @@ const login = asyncRouteHandler(async (req, res) => {
         "-password -refreshToken"
     );
 
-    
-
     res.status(200)
         .cookie("acc_token", accessToken, options)
         .json(new ApiResponse(200, loggedInUser, "Login successful"));
@@ -139,6 +137,7 @@ const logout = asyncRouteHandler(async (req, res) => {
         .clearCookie("acc_token", options)
         .clearCookie("ref_token", options)
         .json(new ApiResponse(200, {}, "Logout successful"));
+    console.log("Logged successfully")
 });
 const updateUserDetails = asyncRouteHandler(async (req, res) => {
     const { oldPassword, newPassword, confirmPassword } = req.body;
@@ -214,9 +213,11 @@ const refreshToken = asyncRouteHandler(async (req, res) => {
 });
 
 const checkAuth = asyncRouteHandler(async (req, res) => {
-    res.status(200).json(
-        new ApiResponse(200, await User.findById(req.userId), "Logged in")
-    );
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, await User.findById(req.userId), "Logged in")
+        );
 });
 
 export {

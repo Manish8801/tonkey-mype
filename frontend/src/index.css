@@ -10,6 +10,7 @@
   --color-content-secondary: #646669;
   --color-content-main: #e2b714;
   --color-wrong-letter: #7e2a33;
+  --color-sub-alt-color: #2c2e31;
   --breakpoint-xs: 560px;
   --breakpoint-sm: 720px;
   --breakpoint-md: 848px;
@@ -23,5 +24,5 @@
   --graph-text-color: #d1d0c5;
   --graph-bg-color: #323437;
   --graph-text-color-secondary: #646669;
-  --graph-border-color: rgba(0,0,0,0.1);
+  --graph-border-color: rgba(0, 0, 0, 0.1);
 }

@@ -7,8 +7,7 @@ async function verifyJwt(req, res, next) {
     try {
         const acc_token =
             req.cookies?.acc_token ||
-            req.header("Authorization").replace("Bearer", "");
-
+            req.header("Authorization")?.replace("Bearer", "");
 
         const decoded = jwt.verify(acc_token, JWT_ACCESS_SECRET);
 
@@ -19,6 +18,6 @@ async function verifyJwt(req, res, next) {
     } catch (err) {
         next(new UnauthorizedError(err.message));
     }
-}  
+}
 
 export default verifyJwt;

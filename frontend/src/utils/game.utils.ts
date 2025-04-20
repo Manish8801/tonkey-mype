@@ -86,7 +86,9 @@ function genMatter({
   max = 0,
 }: IGenConfigs) {
   let final: string[] = Array.from(
-    min > 0 ? generate({ min, max: max || min + 20 }) : generate({ exactly })
+    min > 0
+      ? generate({ min, max: max || min + 20,maxLength: 5})
+      : generate({ exactly, maxLength: 5})
   );
 
   if (number) {
@@ -104,7 +106,11 @@ function genMatter({
   }
   return join ? final.join(join) : final.join(" ");
 }
-function getResult(valuePerSecond: string[], matter: string) {
+function getResult(
+  timeInSec: number,
+  valuePerSecond: string[],
+  matter: string
+) {
   const seconds = valuePerSecond.length;
 
   const wrongCharCounts: (number | null)[] = [];
@@ -118,7 +124,12 @@ function getResult(valuePerSecond: string[], matter: string) {
       compareString(value, matter.slice(0, value.length));
 
     wrongCharCounts.push(wrongCharCount || null);
-    firstWrongIndexes.push(wrongCharIndexes[0] ?? null);
+    firstWrongIndexes.push(
+      wrongCharIndexes[0] &&
+        !firstWrongIndexes.some((index) => index === wrongCharIndexes[0])
+        ? wrongCharIndexes[0]
+        : null
+    );
 
     wpmSpeed.push(Math.floor((correctCharCount / (5 * (second + 1))) * 60));
     rawSpeed.push(
@@ -142,6 +153,7 @@ function getResult(valuePerSecond: string[], matter: string) {
   const acc = Math.floor((wpm / raw) * 100);
 
   return {
+    timeInSec,
     wpm,
     raw,
     acc,

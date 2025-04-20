@@ -1,4 +1,5 @@
-import useDialogStore from "../zustand/useDialogStore";
+
+import useDialogStore from "../../zustand/useDialogStore";
 import SetDuration from "./components/SetDuration";
 import SetWordCount from "./components/SetWordCount";
 

@@ -1,11 +1,15 @@
-import { Link } from "react-router-dom";
-import useAuthStore from "../zustand/useAuthStore";
+import { FaSignOutAlt } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
+import { IoEarth } from "react-icons/io5";
+import { GiProgression } from "react-icons/gi";
+import { Link, useNavigate } from "react-router-dom";
+import useAuthStore from "../../zustand/useAuthStore";
 import { FaBell, FaCrown, FaKeyboard } from "react-icons/fa6";
-import { IoPersonSharp, IoSettingsSharp } from 'react-icons/io5';
+import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
+import ProfileIconButtonOptions from "./components/ProfileIconButtonOptions";
 
 const Header = () => {
-  const { user } = useAuthStore();
-
+  const { isLoggedIn, user } = useAuthStore();
   return (
     <header className="w-full flex items-center gap-4 mx-auto">
       <Link to="/" className="logo-container flex gap-2 relative">
@@ -48,12 +52,18 @@ const Header = () => {
           <button className="p-2 cursor-pointer ease-out duration-200 hover:text-content-primary text-xl">
             <FaBell />
           </button>
-          <Link
-            to={user ? "/profile" : "/login"}
-            className="p-2 ease-out duration-200 hover:text-content-primary text-xl"
-          >
-            <IoPersonSharp />
-          </Link>
+          <div className="group relative">
+            <Link
+              to={user ? "/profile" : "/login"}
+              className="p-2 relative flex gap-1 ease-out duration-200 hover:text-content-primary text-xl"
+            >
+              <IoPersonSharp />
+              {isLoggedIn && (
+                <span className="font-roboto text-xs">{user?.username}</span>
+              )}
+            </Link>
+            <ProfileIconButtonOptions />
+          </div>
         </div>
       </div>
     </header>

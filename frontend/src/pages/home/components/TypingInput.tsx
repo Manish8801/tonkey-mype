@@ -39,11 +39,12 @@ const TypingInput = () => {
   const yCoordFirstLine = useRef<number>(0);
   const startTime = useRef<number>(0);
   const valuePerSecond = useRef<string[]>([]);
+  const timer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
     // if value length is greater than or equal length of matter
-    if (valueLength >= paragraphRef.current!.children.length + 1) {
+    if (valueLength >= matter.length + 1) {
       e.preventDefault();
       e.target.value = value.current;
       return;
@@ -109,25 +110,23 @@ const TypingInput = () => {
   };
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
     let elapsed = 0;
 
     if (isTypingStarted) {
-      timer = setInterval(() => {
+      timer.current = setInterval(() => {
         const isGameOver =
           (mode === "session" && elapsed === session) ||
-          (mode === "words" && valuePerSecond.current.length === wordCount);
+          (mode === "words" && value.current.length === matter.length);
         if (isGameOver) {
-          clearInterval(timer);
-          console.log(valuePerSecond.current, matter);
-          setResult(valuePerSecond.current);
+          clearInterval(timer.current);
+          setResult(elapsed, valuePerSecond.current);
           showResult();
         }
         if (isFocused) elapsed++;
         valuePerSecond.current.push(value.current);
       }, 1000);
     }
-  }, [isTypingStarted, isFocused, session]);
+  }, [isTypingStarted, isFocused, session, mode]);
 
   // don't touch it
   useEffect(() => {
@@ -144,6 +143,7 @@ const TypingInput = () => {
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
     lastCorrectIndex.current = 0;
     startTime.current = 0;
+    timer.current = undefined;
 
     // reset the styles
     if (charRefs.current[0]) {

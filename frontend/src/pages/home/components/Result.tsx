@@ -22,7 +22,7 @@ const Result = () => {
         <div>
           <div className="text-content-secondary text-3xl sm:text-4xl">acc</div>
           <div className="text-content-main text-5xl sm:text-6xl">
-            {result?.acc||0}%
+            {result?.acc || 0}%
           </div>
         </div>
       </div>
@@ -39,18 +39,16 @@ const Result = () => {
         {punctuation && <div className="text-content-main ">punctuation</div>}
       </div>
       <div>
-        <div className="flex-1 grid text-center xs:grid-cols-2 justify-items-center-safe  xs:gap-y-2 md:grid-cols-4">
+        <div className="flex-1 flex justify-around text-center xs:grid-cols-2 xs:gap-y-2 md:grid-cols-4">
           <div>
             <div className="text-content-secondary text-base">raw</div>
             <div className="text-content-main text-3xl">{result?.raw}</div>
           </div>
           <div>
             <div className="text-content-secondary text-base">characters</div>
-            <div className="text-content-main text-3xl">70/0/0/0</div>
-          </div>
-          <div>
-            <div className="text-content-secondary text-base">consistency</div>
-            <div className="text-content-main text-3xl">52%</div>
+            <div className="text-content-main text-3xl">
+              {result?.wpm}/{result?.raw}
+            </div>
           </div>
           <div>
             <div className="text-content-secondary text-base">time</div>
@@ -66,4 +64,3 @@ const Result = () => {
 };
 
 export default Result;
-

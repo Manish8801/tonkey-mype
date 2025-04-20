@@ -6,8 +6,8 @@ import { getNumArr } from "../../../utils/helper";
 Chart.register(...registerables);
 
 const Graph = () => {
-  const { result, session } = useGameStore();
-  const seconds = getNumArr(session);
+  const { result } = useGameStore();
+  const seconds = getNumArr(result?.timeInSec || 10);
   const wpmSpeed = result?.wpmSpeed || [];
   const rawSpeed = result?.rawSpeed || [];
   const errors = result?.wrongCharCounts || [];
@@ -24,7 +24,7 @@ const Graph = () => {
         yAxisId: "y1",
         showLine: false,
         pointStyle: "crossRot",
-        pointRadius: 3,
+        pointRadius: 3.5,
         borderWidth: 2,
         pointBackgroundColor: "#ff5733",
       },
@@ -35,7 +35,8 @@ const Graph = () => {
         yAxisId: "y",
         tension: 0.4,
         pointBackgroundColor: "#e2b714",
-        borderWidth: 2,
+        borderWidth: 3,
+        pointRadius: 2,
       },
       {
         label: "Raw",
@@ -47,7 +48,8 @@ const Graph = () => {
         backgroundColor: "rgba(0,0,0,.3)",
         usePointStyle: true,
         pointBackgroundColor: "#646669",
-        borderWidth: 2,
+        borderWidth: 3,
+        pointRadius: 2,
       },
     ],
   };
@@ -60,7 +62,7 @@ const Graph = () => {
         display: false,
       },
       tooltip: {
-        mode: "index",
+        mode: "index" as const,
         intersect: false,
         callbacks: {
           label: function (context: any) {
@@ -80,25 +82,24 @@ const Graph = () => {
         bodyColor: "#fff",
         displayColors: true,
         bodyFont: {
-          weight: "bold",
+          weight: 600,
         },
       },
     },
     scales: {
       y: {
-        type: "linear",
-        position: "left",
+        type: "linear" as const,
+        position: "left" as const,
         title: {
           font: {
-            weight: "bold",
-            size: 16,
+            weight: 800,
           },
-          align: "center",
+          align: "center" as const,
           display: true,
           text: "Words per minute", // Label for left y-axis
         },
         ticks: {
-          maxTicksLimit: 4,
+          maxTicksLimit: 5,
           color: "#646669",
         },
       },
@@ -106,23 +107,21 @@ const Graph = () => {
         grid: {
           drawOnChartArea: false,
         },
-        type: "linear",
-        position: "right",
+        type: "linear" as const,
+        position: "right" as const,
         title: {
           font: {
-            weight: "bold",
+            weight: 800,
           },
-          align: "center",
+          align: "center" as const,
           display: true,
           text: "Errors",
         },
         ticks: {
-          maxTicksLimit: 4,
+          maxTicksLimit: 5,
           color: "#646669",
           beginAtZero: true,
         },
-        min: 0,
-        max: Math.max(...errors.filter((item) => item !== null)),
       },
     },
   };

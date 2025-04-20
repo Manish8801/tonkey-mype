@@ -1,11 +1,12 @@
 import { Line } from "rc-progress";
 import useAuthStore from "../../zustand/useAuthStore";
 
-const Profiles = () => {
+const Profile = () => {
   const { user } = useAuthStore();
+
   return (
     <div className="flex-1 flex flex-col gap-10 font-roboto py-8">
-      <div className="p-4 flex bg-[rgba(0,0,0,.12)] rounded-lg space-x-4">
+      <div className="p-4 flex bg-sub-alt-color  rounded-lg space-x-4">
         <div className=" w-[25%] flex flex-col gap-3">
           <div className="flex items-center gap-4">
             <img
@@ -19,11 +20,12 @@ const Profiles = () => {
               </h1>
               <p className="text-content-secondary text-xs">
                 Joined{" "}
-                {new Date(user?.createdAt).toLocaleDateString("en-US", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+                {user?.createdAt &&
+                  new Date(user.createdAt).toLocaleDateString("en-US", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
               </p>
             </div>
           </div>
@@ -64,10 +66,10 @@ const Profiles = () => {
             </h2>
           </div>
         </div>
-        <div className="flex-1 bg-red-500"></div>
+        <div className="flex-1"></div>
       </div>
     </div>
   );
 };
 
-export default Profiles;
+export default Profile;
