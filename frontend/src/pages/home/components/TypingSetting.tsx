@@ -23,31 +23,36 @@ const TypingSetting = () => {
     matter,
   } = useGameStore();
 
-  const { toggleDurationDialog, toggleWordCountDialog } = useDialogStore();
+  const {
+    toggleDurationDialog,
+    toggleTypingSettingDialog,
+    toggleWordCountDialog,
+  } = useDialogStore();
 
   useEffect(() => {
-    console.log("setting rendered");
-  }, []);
-  useEffect(() => {
-    setSession(15);
+    setSession(session);
     setMode(mode);
   }, [matter]);
+
   useEffect(() => {
     genMatter();
   }, [number, punctuation, cases, mode, session, wordCount, genMatter]);
 
   return (
-    <div className="bg-[rgba(0,0,0,.13)] text-config flex items-center justify-center mx-auto px-4 C w-fit rounded-lg text-content-secondary  leading-4">
+    <div className="bg-[rgba(0,0,0,.13)] text-config flex items-center justify-center mx-auto w-fit rounded-lg text-content-secondary overflow-hidden leading-4">
       {/* small screen */}
-      <div className="sm:hidden py-2.5 px-2 flex items-center justify-center  gap-4 mx-auto hover:text-content-primary text-[.65rem] duration-200 ease-out">
+      <button
+        onClick={() => toggleTypingSettingDialog()}
+        className="cursor-pointer hover:text-base-primary active:bg-content-secondary hover:bg-content-primary sm:hidden py-2.5 px-2 flex items-center justify-center  gap-4 mx-auto text-[.65rem] duration-75 ease-linear"
+      >
         <IoSettingsSharp />
         <div className="font-semibold tracking-wide font-roboto text-sm">
           Test settings
         </div>
-      </div>
+      </button>
 
       {/* medium screen */}
-      <div className="hidden sm:flex max-w-full sm:text-[0.7rem] md:text-[0.75rem] lg:text-[0.8rem] items-center justify-between sm:gap-1.5 md:gap-2 lg:gap-2.5 ">
+      <div className="hidden sm:flex max-w-full sm:text-[0.7rem] md:text-[0.75rem] lg:text-[0.8rem] items-center justify-between sm:gap-1.5 md:gap-2 lg:gap-2.5 px-4">
         <button
           className={`${
             punctuation ? "text-content-main" : "hover:text-content-primary"
@@ -72,8 +77,10 @@ const TypingSetting = () => {
           } gap-1 py-2.5 flex justify-center items-center hover:text-content-primary duration-200 ease-out`}
           onClick={() => toggleCases()}
         >
-          <span className="relative z-auto top-[.5px] sm:text-xs md:text-sm font-semibold">Aa</span>
-          <span className="font-semibold">Cases</span> 
+          <span className="relative z-auto top-[.5px] sm:text-xs md:text-sm font-semibold">
+            Aa
+          </span>
+          <span className="font-semibold">Cases</span>
         </button>
         <div
           className="h-7 rounded-full sm:w-[2px] md:w-[3px] lg:w-[4px] bg-base-primary"
@@ -108,7 +115,7 @@ const TypingSetting = () => {
         />
         <button
           className={`${
-            (mode === "session" && session === 10) ||
+            (mode === "session" && session === 15) ||
             (mode === "words" && wordCount === 10)
               ? "text-content-main"
               : "hover:text-content-primary duration-200"

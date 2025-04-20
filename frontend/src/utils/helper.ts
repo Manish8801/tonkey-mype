@@ -9,7 +9,6 @@ function formatTime({ h, m, s }: { h: number; m: number; s: number }) {
 
   return { hours, minutes, seconds, timeInSec, formatted };
 }
-console.log(formatTime({ h: 0, m: 0, s: 2500 }));
 
 function getNumArr(length: number) {
   return Array.from({ length }, (_, i) => i + 1);

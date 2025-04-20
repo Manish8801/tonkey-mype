@@ -135,17 +135,20 @@ const TypingInput = () => {
     if (isFocused) inputRef.current?.focus();
   }, [isFocused]);
 
+  // just generates the matter
   useEffect(() => {
     genMatter();
-  }, [mode, session, wordCount, number, punctuation, cases]);
+  }, [cases, mode, number, punctuation, session, wordCount]);
 
   useEffect(() => {
     // reset the values
     if (inputRef.current) inputRef.current.value = "";
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
+    valuePerSecond.current = [];
     lastCorrectIndex.current = 0;
     startTime.current = 0;
     timer.current = undefined;
+    value.current = "";
 
     // reset the styles
     if (charRefs.current[0]) {

@@ -1,19 +1,23 @@
 import { create } from "zustand";
 
 type TStore = {
-  isDurationDialogOpen: boolean;
-  isWordCountDialogOpen: boolean;
+  isDurationModalOpen: boolean;
+  isWordCountModalOpen: boolean;
+  isTypingSettingModalOpen: boolean;
+  toggleTypingSettingDialog: () => void;
   toggleDurationDialog: () => void;
   toggleWordCountDialog: () => void;
 };
 const useDialogStore = create<TStore>()((set, get) => ({
-  isDurationDialogOpen: false,
-  isWordCountDialogOpen: false,
+  isDurationModalOpen: false,
+  isWordCountModalOpen: false,
+  isTypingSettingModalOpen: false,
+  toggleTypingSettingDialog: () =>
+    set({ isTypingSettingModalOpen: !get().isTypingSettingModalOpen }),
   toggleDurationDialog: () =>
-    set({ isDurationDialogOpen: !get().isDurationDialogOpen }),
+    set({ isDurationModalOpen: !get().isDurationModalOpen }),
   toggleWordCountDialog: () =>
-    set({ isWordCountDialogOpen: !get().isWordCountDialogOpen }),
-
+    set({ isWordCountModalOpen: !get().isWordCountModalOpen }),
 }));
 
 export default useDialogStore;

@@ -3,20 +3,20 @@ import { genMatter, getResult } from "../utils/game.utils";
 import type { IGenConfigs, IResult } from "../types/type";
 
 type TStore = {
-  errors: { [key: string]: number };
-  isTypingStarted: boolean;
   actual: string;
-  isFocused: boolean;
   cases: boolean;
+  errors: { [key: string]: number };
+  isFocused: boolean;
+  isGameOver: boolean;
+  isTypingStarted: boolean;
   matter: string;
   mode: "words" | "session";
   number: boolean;
   punctuation: boolean;
   result: IResult | null;
+  resultShown: boolean;
   session: number;
   wordCount: number;
-  isGameOver: boolean;
-  resultShown: boolean;
   setResult: (timeInSec: number, valuePerSecond: string[]) => void;
   toggleIsTypingStarted: () => void;
   setErrors: (errors: { [key: string]: number }) => void;
@@ -50,33 +50,35 @@ const useGameStore = create<TStore>()((set, get) => ({
   isGameOver: false,
   resultShown: false,
   graphData: null,
-  setErrors: (errors) => set({ errors }),
-  toggleIsTypingStarted: () => set({ isTypingStarted: !get().isTypingStarted }),
-  setActual: (actual) => set({ actual }),
-  showResult: () => set({ resultShown: true }),
-  setResult: (timeInSec, valuePerSecond) => {
-    const { matter } = get();
-    set({ result: getResult(timeInSec, valuePerSecond, matter) });
+  genMatter: () => {
+    const { number, punctuation, cases, mode, session, wordCount } = get();
+    const configs: IGenConfigs = { number, punctuation, cases };
+    if (mode === "words") configs.exactly = wordCount;
+    else configs.min = session * 5;
+    const matter = genMatter(configs);
+    set({ matter });
   },
   overGame: () => set({ isGameOver: true }),
   restartGame: () => set({ isGameOver: false }),
-  toggleIsFocused: () => set({ isFocused: !get().isFocused }),
-  setSession: (session) => set({ session }),
-  toggleCases: () => set({ cases: !get().cases }),
-  toggleNumber: () => set({ number: !get().number }),
-  setWordCount: (wordCount) => set({ wordCount }),
-  togglePunctuation: () => set({ punctuation: !get().punctuation }),
-  setMode: (mode) => set({ mode }),
-  genMatter: () => {
-    const { number, punctuation, cases, mode, session, wordCount } = get();
-
-    const configs: IGenConfigs = { number, punctuation, cases };
-
-    if (mode === "words") configs.exactly = wordCount;
-    else configs.min = session * 5;
-
-    set({ matter: genMatter(configs) });
+  setActual: (actual) => set({ actual }),
+  setErrors: (errors) => set({ errors }),
+  setMode: (mode) => {
+    set({ mode });
+    console.log(get().mode);
   },
+  setResult: (timeInSec, valuePerSecond) => {
+    const { matter } = get();
+    const result = getResult(timeInSec, valuePerSecond, matter);
+    set({ result });
+  },
+  setSession: (session) => set({ session }),
+  setWordCount: (wordCount) => set({ wordCount }),
+  showResult: () => set({ resultShown: true }),
+  toggleCases: () => set({ cases: !get().cases }),
+  toggleIsFocused: () => set({ isFocused: !get().isFocused }),
+  toggleIsTypingStarted: () => set({ isTypingStarted: !get().isTypingStarted }),
+  toggleNumber: () => set({ number: !get().number }),
+  togglePunctuation: () => set({ punctuation: !get().punctuation }),
 }));
 
 export default useGameStore;

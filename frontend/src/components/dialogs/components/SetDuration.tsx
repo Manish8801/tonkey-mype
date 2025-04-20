@@ -5,7 +5,7 @@ import { formatTime } from "../../../utils/helper";
 
 
 const SetDuration = () => {
-  const { isDurationDialogOpen, toggleDurationDialog } = useDialogStore();
+  const { isDurationModalOpen, toggleDurationDialog } = useDialogStore();
   const { session, setSession } = useGameStore();
   const [value, setValue] = useState<string>(String(session));
   const descriptionRef = useRef<HTMLDivElement | null>(null);
@@ -63,7 +63,7 @@ const SetDuration = () => {
   useEffect(() => {
     window.addEventListener("mousedown", handleOutSideClick);
     return () => window.removeEventListener("mousedown", handleOutSideClick);
-  }, [isDurationDialogOpen]);
+  }, [isDurationModalOpen]);
 
   return (
     <div className="h-screen w-screen flex items-center justify-center p-8 select-none ">

@@ -4,7 +4,7 @@ import useDialogStore from "../../../zustand/useDialogStore";
 
 
 const SetWordCount = () => {
-  const { isWordCountDialogOpen, toggleWordCountDialog } = useDialogStore();
+  const { isWordCountModalOpen, toggleWordCountDialog } = useDialogStore();
   const { wordCount, setWordCount } = useGameStore();
   const [value, setValue] = useState<number>(wordCount);
   const dialogRef = useRef<HTMLFormElement | null>(null);
@@ -23,7 +23,7 @@ const SetWordCount = () => {
   useEffect(() => {
     window.addEventListener("mousedown", handleOutSideClick);
     return () => window.removeEventListener("mousedown", handleOutSideClick);
-  }, [isWordCountDialogOpen]);
+  }, [isWordCountModalOpen]);
 
   return (
     <div className="h-screen w-screen flex items-center justify-center p-8 select-none ">

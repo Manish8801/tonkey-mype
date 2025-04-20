@@ -2,7 +2,6 @@ import { FaChevronRight } from "react-icons/fa";
 import { RiLoopLeftLine } from "react-icons/ri";
 import { IoWarning } from "react-icons/io5";
 import { HiMiniBackward } from "react-icons/hi2";
-import { FaBackward } from "react-icons/fa";
 import { HiMiniPhoto } from "react-icons/hi2";
 import { formatTime } from "../../../utils/helper";
 import useGameStore from "../../../zustand/useGameStore";
