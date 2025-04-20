@@ -87,8 +87,8 @@ function genMatter({
 }: IGenConfigs) {
   let final: string[] = Array.from(
     min > 0
-      ? generate({ min, max: max || min + 20,maxLength: 5})
-      : generate({ exactly, maxLength: 5})
+      ? generate({ min, max: max || min + 20, maxLength: 5 })
+      : generate({ exactly, maxLength: 5 })
   );
 
   if (number) {
@@ -111,59 +111,60 @@ function getResult(
   valuePerSecond: string[],
   matter: string
 ) {
-  const seconds = valuePerSecond.length;
-
   const wrongCharCounts: (number | null)[] = [];
   const firstWrongIndexes: (number | null)[] = [];
+  const lastValue = valuePerSecond[valuePerSecond.length - 1];
 
+  // wpm speed and raw wpm only
   const wpmSpeed: number[] = [];
   const rawSpeed: number[] = [];
-
   valuePerSecond.forEach((value, second) => {
-    const { correctCharCount, wrongCharCount, wrongCharIndexes } =
-      compareString(value, matter.slice(0, value.length));
-
-    wrongCharCounts.push(wrongCharCount || null);
-    firstWrongIndexes.push(
-      wrongCharIndexes[0] &&
-        !firstWrongIndexes.some((index) => index === wrongCharIndexes[0])
-        ? wrongCharIndexes[0]
-        : null
-    );
-
-    wpmSpeed.push(Math.floor((correctCharCount / (5 * (second + 1))) * 60));
+    const { correctCharCount, charCount } = compareString(value, matter);
+    wpmSpeed.push(Math.floor((correctCharCount / 5 / (second + 1)) * 60));
     rawSpeed.push(
-      Math.floor(
-        (value.length / (5 * (second + 2))) * 60 < 4
-          ? 0
-          : (value.length / (5 * (second + 2))) * 60
-      )
+      Math.floor((charCount / 5 / (second + 2)) * 60) < 4
+        ? 0
+        : Math.floor((charCount / 5 / (second + 2)) * 60)
     );
-
-    const isLast = second === valuePerSecond.length - 1;
-    if (!isLast) return;
   });
 
-  const lastValue = valuePerSecond[seconds - 1];
+  // errors
+  let prevCheckValueLength = 0;
+  valuePerSecond.forEach((value) => {
+    const { wrongCharCount, wrongCharIndexes } = compareString(
+      value.slice(prevCheckValueLength),
+      matter.slice(prevCheckValueLength)
+    );
+    wrongCharCounts.push(wrongCharCount || null);
+    firstWrongIndexes.push(
+      wrongCharCount === 0 ? null : prevCheckValueLength + wrongCharIndexes[0]
+    );
+    prevCheckValueLength = value.length;
+  });
 
-  const wpm = Math.floor(
-    (compareString(lastValue, matter).correctCharCount / 5) * (60 / seconds)
+  // wpm, raw, acc, correct, incorrect
+  const { correctCharCount, wrongCharCount } = compareString(
+    lastValue.split(" ").join(""),
+    matter.split(" ").join("")
   );
-  const raw = Math.floor((lastValue.length / 5) * (60 / seconds));
-  const acc = Math.floor((wpm / raw) * 100);
+
+  const wpm = floor((correctCharCount / 5) * (60 / timeInSec));
+  const raw = floor((lastValue.length / 5) * (60 / timeInSec));
+  const acc = floor((wpm / raw) * 100);
 
   return {
     timeInSec,
     wpm,
     raw,
     acc,
-    wpmSpeed,
-    rawSpeed,
+    correctCharCount,
+    wrongCharCount,
     wrongCharCounts,
     firstWrongIndexes,
+    wpmSpeed,
+    rawSpeed,
   };
 }
-
 export {
   getResult,
   genMatter,

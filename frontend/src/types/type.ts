@@ -52,10 +52,12 @@ export interface IResult {
   wpm: number;
   raw: number;
   acc: number;
-  wpmSpeed: number[];
-  rawSpeed: number[];
+  correctCharCount: number;
+  wrongCharCount: number;
   wrongCharCounts: (number | null)[];
   firstWrongIndexes: (number | null)[];
+  wpmSpeed: number[];
+  rawSpeed: number[];
 }
 export interface IGraphData {
   wpmSpeed: number[];

@@ -118,6 +118,8 @@ const TypingInput = () => {
           (mode === "session" && elapsed === session) ||
           (mode === "words" && value.current.length === matter.length);
         if (isGameOver) {
+          console.log(valuePerSecond.current);
+          console.log(matter);
           clearInterval(timer.current);
           setResult(elapsed, valuePerSecond.current);
           showResult();

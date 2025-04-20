@@ -24,7 +24,7 @@ const Graph = () => {
         yAxisId: "y1",
         showLine: false,
         pointStyle: "crossRot",
-        pointRadius: 3.5,
+        pointRadius: 4,
         borderWidth: 2,
         pointBackgroundColor: "#ff5733",
       },
