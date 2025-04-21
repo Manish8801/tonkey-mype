@@ -62,10 +62,7 @@ const useGameStore = create<TStore>()((set, get) => ({
   restartGame: () => set({ isGameOver: false }),
   setActual: (actual) => set({ actual }),
   setErrors: (errors) => set({ errors }),
-  setMode: (mode) => {
-    set({ mode });
-    console.log(get().mode);
-  },
+  setMode: (mode) => set({ mode }),
   setResult: (timeInSec, valuePerSecond) => {
     const { matter } = get();
     const result = getResult(timeInSec, valuePerSecond, matter);

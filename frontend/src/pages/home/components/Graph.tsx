@@ -13,7 +13,6 @@ const Graph = () => {
   const errors = result?.wrongCharCounts || [];
   const errorIndexes = result?.firstWrongIndexes || [];
 
-  console.log(result);
   const data = {
     labels: seconds, // x-axis time in seconds
     datasets: [

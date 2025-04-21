@@ -3,7 +3,6 @@ import useDialogStore from "../../../zustand/useDialogStore";
 import useGameStore from "../../../zustand/useGameStore";
 import { formatTime } from "../../../utils/helper";
 
-
 const SetDuration = () => {
   const { isDurationModalOpen, toggleDurationDialog } = useDialogStore();
   const { session, setSession } = useGameStore();
@@ -20,43 +19,48 @@ const SetDuration = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSession(timeInSec.current);
+
     timeInSec.current = 0;
     toggleDurationDialog();
   };
 
   useEffect(() => {
-    if (descriptionRef.current) {
-      if (value === "0" || !value) {
-        descriptionRef.current.textContent = "Infinite test";
-      } else if (
-        !value.includes("h") &&
-        !value.includes("m") &&
-        !value.includes("s")
-      ) {
-        descriptionRef.current.textContent = `${value} seconds`;
-      } else {
-        const hIdx = value.indexOf("h");
-        const mIdx = value.indexOf("m");
-        const sIdx = value.indexOf("s");
+    if (!descriptionRef.current) return;
 
-        let h = 0;
-        let m = 0;
-        let s = 0;
+    if (!value) descriptionRef.current.textContent = "Infinite test";
+    else {
+      let [hIdx, mIdx, sIdx] = [-1, -1, -1];
 
-        if (hIdx !== -1) h = +value.slice(0, hIdx);
-        if (mIdx !== -1) m = +value.slice(hIdx + 1, mIdx);
-        if (sIdx !== -1) s = +value.slice(mIdx + 1, sIdx);
-
-        const result = formatTime({ h, m, s });
-
-        descriptionRef.current.textContent = `${result.hours} ${
-          result.hours === 1 ? "hour" : "hours"
-        }, ${result.minutes} ${result.minutes === 1 ? "minute" : "minutes"}, ${
-          result.seconds
-        } ${result.seconds === 1 ? "second" : "seconds"}`;
-
-        timeInSec.current = result.timeInSec;
+      for (let i = 0; i < value.length; i++) {
+        if (value[i] === "h") hIdx = i;
+        if (value[i] === "m") mIdx = i;
+        if (value[i] === "s") sIdx = i;
       }
+
+      let [h, m, s] = [0, 0, +value || 0];
+
+      // get the values of h, m, s
+      if (hIdx !== -1) h = +value.slice(0, hIdx);
+      if (mIdx !== -1) m = +value.slice(hIdx + 1, mIdx);
+      if (sIdx !== -1) s = +value.slice(mIdx + 1, sIdx);
+
+      // get pure hours, minutes and seconds
+      const {
+        hours,
+        minutes,
+        seconds,
+        timeInSec: inSeconds,
+      } = formatTime({ h, m, s });
+
+      // formatting the in 01h, 01m, 04s
+      descriptionRef.current.textContent = `${hours} ${
+        hours === 1 ? "hour" : "hours"
+      }, ${minutes} ${minutes === 1 ? "minute" : "minutes"}, ${seconds} ${
+        seconds === 1 ? "second" : "seconds"
+      }`;
+
+      // set the time in seconds
+      timeInSec.current = inSeconds;
     }
   }, [value]);
 

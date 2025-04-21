@@ -20,7 +20,6 @@ const TypingSetting = () => {
     setMode,
     toggleNumber,
     togglePunctuation,
-    matter,
   } = useGameStore();
 
   const {
@@ -28,12 +27,7 @@ const TypingSetting = () => {
     toggleTypingSettingDialog,
     toggleWordCountDialog,
   } = useDialogStore();
-
-  useEffect(() => {
-    setSession(session);
-    setMode(mode);
-  }, [matter]);
-
+  
   useEffect(() => {
     genMatter();
   }, [number, punctuation, cases, mode, session, wordCount, genMatter]);

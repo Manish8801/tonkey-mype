@@ -21,13 +21,12 @@ function compareString(actual: string, original: string) {
   let wrongCharCount = 0;
   for (let i = 0; i < actual.length; i++) {
     charCount++;
-    if (actual[i] !== " ") {
       if (actual[i] === original[i]) correctCharCount++;
       else {
         wrongCharIndexes.push(i);
         wrongCharCount++;
       }
-    }
+    
   }
   return { correctCharCount, wrongCharCount, charCount, wrongCharIndexes };
 }

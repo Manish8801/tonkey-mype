@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 
 const Timer = () => {
-  const { mode, session, isFocused, isTypingStarted, matter } =
-    useGameStore();
+  const { mode, session, isFocused, isTypingStarted, matter } = useGameStore();
 
   const [timeLeft, setTimeLeft] = useState(session);
 
@@ -13,9 +12,10 @@ const Timer = () => {
   }, [matter]);
 
   useEffect(() => {
+    console.log(session, timeLeft);
     if (!isFocused || mode !== "session" || !isTypingStarted) return;
     let timer: NodeJS.Timeout | undefined;
-    if (timeLeft >= 1) {
+    if (timeLeft > 1) {
       timer = setInterval(
         () => {
           setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);

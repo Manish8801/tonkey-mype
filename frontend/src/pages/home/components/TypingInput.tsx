@@ -111,15 +111,12 @@ const TypingInput = () => {
 
   useEffect(() => {
     let elapsed = 0;
-
     if (isTypingStarted) {
       timer.current = setInterval(() => {
         const isGameOver =
           (mode === "session" && elapsed === session) ||
           (mode === "words" && value.current.length === matter.length);
         if (isGameOver) {
-          console.log(valuePerSecond.current);
-          console.log(matter);
           clearInterval(timer.current);
           setResult(elapsed, valuePerSecond.current);
           showResult();
@@ -150,7 +147,7 @@ const TypingInput = () => {
     timer.current = undefined;
     value.current = "";
 
-    // reset the styles
+    // replace the caret to the start
     if (charRefs.current[0]) {
       const { x, y } = getOffsets(charRefs.current[0]);
       yCoordFirstLine.current = y;
