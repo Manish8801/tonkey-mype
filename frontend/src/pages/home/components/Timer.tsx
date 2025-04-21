@@ -12,7 +12,6 @@ const Timer = () => {
   }, [matter]);
 
   useEffect(() => {
-    console.log(session, timeLeft);
     if (!isFocused || mode !== "session" || !isTypingStarted) return;
     let timer: NodeJS.Timeout | undefined;
     if (timeLeft > 1) {
@@ -28,7 +27,7 @@ const Timer = () => {
     }
   }, [isFocused, timeLeft, mode, isTypingStarted]);
 
-  if (mode === "words") return null;
+  if (mode === "words" || session === 0) return null;
 
   return (
     <div className="place-self-start text-content-main text-3xl">

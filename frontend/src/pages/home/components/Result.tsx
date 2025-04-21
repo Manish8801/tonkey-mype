@@ -7,11 +7,20 @@ import { formatTime } from "../../../utils/helper";
 import useGameStore from "../../../zustand/useGameStore";
 import Graph from "./Graph";
 import { FaCrown } from "react-icons/fa";
+import { useEffect } from "react";
 
 const Result = () => {
-  const { number, punctuation, cases, result, session } = useGameStore();
+  const { number, punctuation, cases, result, session, setResult } =
+    useGameStore();
+
+  useEffect(() => {
+    return () => {
+      setResult();
+    };
+  }, []);
+
   return (
-    <div className="w-full grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
+    <div className="result w-full grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
       {/* first row */}
       <div className="w-fit mx-auto justify-self-center h-fit xs:justify-self-auto flex flex-col xs:w-full xs:flex-row xs:justify-evenly md:flex-col md:justify-start md:gap-4">
         <div>
@@ -67,11 +76,57 @@ const Result = () => {
           </div>
         </div>
         <div className="text-content-secondary flex items-center justify-center gap-16 text-lg mt-4">
-          <FaChevronRight className="duration-200 ease-in-out hover:text-content-primary" />
-          <RiLoopLeftLine className="duration-200 ease-in-out hover:text-content-primary" />
-          <IoWarning className="duration-200 ease-in-out hover:text-content-primary" />
-          <HiMiniBackward className="duration-200 ease-in-out hover:text-content-primary" />
-          <HiMiniPhoto className="duration-200 ease-in-out hover:text-content-primary" />
+          <button
+            onClick={() => {}}
+            className="relative group duration-200 ease-in-out hover:text-content-primary"
+          >
+            <FaChevronRight />
+            <div className="tooltip group-hover:block hidden absolute -bottom-12 left-1/2 -translate-x-1/2 bg-black py-1 px-4 rounded-md ">
+              <span className="font-semibold text-content-primary text-sm text-nowrap rounded-md ">
+                Next test
+              </span>
+              <div className="bg-black tooltip-arrow absolute rotate-[45deg] red-500 top-0 left-1/2 -translate-1/2 size-2"></div>
+            </div>
+          </button>
+          <button
+            onClick={() => {}}
+            className="relative group duration-200 ease-in-out hover:text-content-primary"
+          >
+            <RiLoopLeftLine />
+            <div className="tooltip group-hover:block hidden absolute -bottom-12 left-1/2 -translate-x-1/2 bg-black py-1 px-4 rounded-md ">
+              <span className="font-semibold text-content-primary text-sm text-nowrap rounded-md ">
+                Restart test
+              </span>
+              <div className="bg-black tooltip-arrow absolute rotate-[45deg] red-500 top-0 left-1/2 -translate-1/2 size-2"></div>
+            </div>
+          </button>
+          <button className="relative group duration-200 ease-in-out hover:text-content-primary">
+            <IoWarning />
+            <div className="tooltip group-hover:block hidden absolute -bottom-12 left-1/2 -translate-x-1/2 bg-black py-1 px-4 rounded-md ">
+              <span className="font-semibold text-content-primary text-sm text-nowrap rounded-md ">
+                Practice words
+              </span>
+              <div className="bg-black tooltip-arrow absolute rotate-[45deg] red-500 top-0 left-1/2 -translate-1/2 size-2"></div>
+            </div>
+          </button>
+          <button className="relative group duration-200 ease-in-out hover:text-content-primary">
+            <HiMiniBackward />
+            <div className="tooltip group-hover:block hidden absolute -bottom-12 left-1/2 -translate-x-1/2 bg-black py-1 px-4 rounded-md ">
+              <span className="font-semibold text-content-primary text-sm text-nowrap rounded-md ">
+                Watch replay
+              </span>
+              <div className="bg-black tooltip-arrow absolute rotate-[45deg] red-500 top-0 left-1/2 -translate-1/2 size-2"></div>
+            </div>
+          </button>
+          <button className="relative group duration-200 ease-in-out hover:text-content-primary">
+            <HiMiniPhoto />
+            <div className="tooltip group-hover:block hidden absolute -bottom-12 left-1/2 -translate-x-1/2 bg-black py-1 px-4 rounded-md ">
+              <span className="font-semibold text-content-primary text-sm text-nowrap rounded-md ">
+                Copy screenshot to clipboard
+              </span>
+              <div className="bg-black tooltip-arrow absolute rotate-[45deg] red-500 top-0 left-1/2 -translate-1/2 size-2"></div>
+            </div>
+          </button>
         </div>
       </div>
     </div>

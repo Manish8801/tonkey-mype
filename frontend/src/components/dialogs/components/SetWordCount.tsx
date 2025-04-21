@@ -2,7 +2,6 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import useGameStore from "../../../zustand/useGameStore";
 import useDialogStore from "../../../zustand/useDialogStore";
 
-
 const SetWordCount = () => {
   const { isWordCountModalOpen, toggleWordCountDialog } = useDialogStore();
   const { wordCount, setWordCount } = useGameStore();
@@ -39,7 +38,7 @@ const SetWordCount = () => {
         <input
           type="number"
           className="outline-none px-2 py-1.5 text-content-primary bg-[rgba(0,0,0,.25)] rounded-lg"
-          value={value}
+          value={value === 0 ? "" : value}
           onChange={(e) => setValue(+e.target.value)}
         />
         <div className="text-content-primary text-xs">

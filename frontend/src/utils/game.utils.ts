@@ -87,7 +87,11 @@ function genMatter({
 }: IGenConfigs) {
   let final: string[] = Array.from(
     min > 0
-      ? generate({ min, max: max || min + 20, maxLength: 5 })
+      ? generate({
+          min: min <= 1000 ? min : 1000,
+          max: max || min + 20,
+          maxLength: 5,
+        })
       : generate({ exactly, maxLength: 5 })
   );
 

@@ -18,7 +18,8 @@ const SetDuration = () => {
   };
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSession(timeInSec.current);
+    if (value === "0" || value === "") setSession(0);
+    else setSession(timeInSec.current);
 
     timeInSec.current = 0;
     toggleDurationDialog();

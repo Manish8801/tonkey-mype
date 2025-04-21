@@ -54,6 +54,7 @@ const useGameStore = create<TStore>()((set, get) => ({
     const { number, punctuation, cases, mode, session, wordCount } = get();
     const configs: IGenConfigs = { number, punctuation, cases };
     if (mode === "words") configs.exactly = wordCount;
+    else if (!session) configs.min = 1000;
     else configs.min = session * 5;
     const matter = genMatter(configs);
     set({ matter });
