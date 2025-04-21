@@ -13,10 +13,9 @@ import Button from "./components/Button";
 import { useCallback } from "react";
 
 const Result = () => {
-  const { number, punctuation, cases, result, session,startGame } =
+  const { number, punctuation, cases, result, session } =
     useGameStore();
 
- 
   const takeScreenshot = useCallback(() => {
     const elemToCapture = document.getElementById("main-container");
     if (elemToCapture) {
@@ -25,6 +24,7 @@ const Result = () => {
       });
     }
   }, []);
+
 
   return (
     <div className="w-full grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr] sm:gap-5 md:gap-6">
@@ -83,7 +83,7 @@ const Result = () => {
           </div>
         </div>
         <div className="text-content-secondary flex items-center justify-center gap-16 text-lg mt-4">
-          <Button onClick={() => startGame()}>
+          <Button onClick={() => hideResult()}>
             <FaChevronRight />
             <Tooltip text=" Next test" />
           </Button>

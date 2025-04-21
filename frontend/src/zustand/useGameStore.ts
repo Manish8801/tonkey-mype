@@ -3,10 +3,7 @@ import { genMatter, getResult } from "../utils/game.utils";
 import type { IGenConfigs, IResult } from "../types/type";
 
 type TStore = {
-  isGameStarted: boolean;
-  actual: string;
   cases: boolean;
-  errors: { [key: string]: number };
   isFocused: boolean;
   isGameOver: boolean;
   isTypingStarted: boolean;
@@ -18,18 +15,14 @@ type TStore = {
   resultShown: boolean;
   session: number;
   wordCount: number;
-  isGameReset: boolean;
-  toggleIsGameReset: () => void;
-  startGame: () => void;
   hideResult: () => void;
   setResult: (
     timeInSec?: number,
     valuePerSecond?: string[],
     matter?: string
   ) => void;
+  reset: () => void;
   toggleIsTypingStarted: () => void;
-  setErrors: (errors: { [key: string]: number }) => void;
-  setActual: (actual: string) => void;
   showResult: () => void;
   overGame: () => void;
   restartGame: () => void;
@@ -44,11 +37,7 @@ type TStore = {
 };
 
 const useGameStore = create<TStore>()((set, get) => ({
-  isGameReset: false,
-  isGameStarted: true,
-  errors: {},
   isTypingStarted: false,
-  actual: "",
   isFocused: false,
   cases: false,
   matter: "",
@@ -60,10 +49,26 @@ const useGameStore = create<TStore>()((set, get) => ({
   wordCount: 20,
   isGameOver: false,
   resultShown: false,
-  graphData: null,
-  toggleIsGameReset: () => set({ isGameReset: !get().isGameStarted }),
-  startGame: () =>
-    set({ resultShown: false, isGameOver: false, isGameStarted: true }),
+  hardReset: () =>
+    set({
+      mode: "session",
+      session: 15,
+      wordCount: 20,
+      number: false,
+      punctuation: false,
+      cases: false,
+      isTypingStarted: false,
+      isFocused: false,
+      result: null,
+    }),
+  reset: () =>
+    set({
+      isTypingStarted: false,
+      isFocused: false,
+      mode: get().mode,
+      session: get().session,
+      wordCount: get().wordCount,
+    }),
   genMatter: () => {
     const { number, punctuation, cases, mode, session, wordCount } = get();
     const configs: IGenConfigs = { number, punctuation, cases };
@@ -76,8 +81,6 @@ const useGameStore = create<TStore>()((set, get) => ({
   hideResult: () => set({ resultShown: false }),
   overGame: () => set({ isGameOver: true }),
   restartGame: () => set({ isGameOver: false }),
-  setActual: (actual) => set({ actual }),
-  setErrors: (errors) => set({ errors }),
   setMode: (mode) => set({ mode }),
   setResult: (timeInSec, valuePerSecond, matter) => {
     if (!(timeInSec && valuePerSecond && matter)) set({ result: null });

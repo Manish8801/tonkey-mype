@@ -4,26 +4,24 @@ import { compareString } from "./helper";
 const { round, random, floor } = Math;
 
 // get and set the positions for the caret
-function getOffsets(elem: HTMLElement) {
-  const x = round(elem.offsetLeft);
-  const y = round(elem.offsetTop);
-  return { x, y };
+function getOffsets(elem: HTMLElement | null) {
+  if (!elem) return { x: 0, y: 0 };
+  const { offsetLeft, offsetTop } = elem;
+  return { x: Math.floor(offsetLeft), y: Math.floor(offsetTop) };
 }
 function placeCaret(
-  caretElem: HTMLDivElement,
+  caretElem: HTMLDivElement | null,
   { x, y }: { x: number; y: number }
 ) {
-  if (caretElem) {
-    caretElem.style.left = x - 1 + "px";
-    caretElem.style.top = y + "px";
-  }
+  if (!caretElem) return;
+  caretElem.style.left = x - 1 + "px";
+  caretElem.style.top = y + "px";
 }
 // style letter wrong, correct or rest
-function resetStyle(elem: HTMLElement) {
-  if (elem) {
-    elem.style.color = "";
-    elem.style.borderBottomColor = "transparent";
-  }
+function resetStyle(elem: HTMLElement | null) {
+  if (!elem) return;
+  elem.style.color = "";
+  elem.style.borderBottomColor = "transparent";
 }
 function styleWrong(elem: HTMLElement) {
   if (elem) {

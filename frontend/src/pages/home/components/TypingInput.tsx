@@ -15,7 +15,6 @@ import TypingSetting from "./TypingSetting";
 
 const TypingInput = () => {
   const {
-    isGameReset,
     isTypingStarted,
     matter,
     isFocused,
@@ -32,6 +31,7 @@ const TypingInput = () => {
     genMatter,
     toggleIsFocused,
     toggleIsTypingStarted,
+    reset,
   } = useGameStore();
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const paragraphRef = useRef<HTMLDivElement | null>(null);
@@ -41,8 +41,25 @@ const TypingInput = () => {
   const value = useRef<string>("");
   const yCoordFirstLine = useRef<number>(0);
   const valuePerSecond = useRef<string[]>([]);
-  const timer = useRef<NodeJS.Timeout | undefined>(undefined);
   const elapsed = useRef<number>(0);
+
+  const resetComponent = () => {
+    if (inputRef.current) inputRef.current.value = "";
+    if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
+
+    value.current = "";
+    elapsed.current = 0;
+    valuePerSecond.current = [];
+    lastCorrectIndex.current = 0;
+
+    const { x, y } = getOffsets(charRefs.current[0]);
+    yCoordFirstLine.current = y;
+    placeCaret(caretRef.current, { x, y });
+
+    charRefs.current?.forEach((span) => {
+      resetStyle(span);
+    });
+  };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
@@ -63,11 +80,11 @@ const TypingInput = () => {
 
     value.current = e.target.value;
     if (valueLength === 0) {
-      const { x, y } = getOffsets(charRefs.current[0]!);
-      if (caretRef.current) placeCaret(caretRef.current, { x, y });
-      resetStyle(charRefs.current[0]!);
+      const span = charRefs.current[0];
+      const { x, y } = getOffsets(span);
+      placeCaret(caretRef.current, { x, y });
+      resetStyle(span);
     }
-
     // last char typed
     const lastCharTyped = value.current[valueLength - 1];
 
@@ -111,26 +128,24 @@ const TypingInput = () => {
         }
       }
       const { x, y } = getOffsets(charRefs.current[valueLength]);
-      if (caretRef.current) placeCaret(caretRef.current, { x, y });
+      placeCaret(caretRef.current, { x, y });
     }
   };
-
   useEffect(() => {
-    if (isGameReset) {
-      toggleIsTypingStarted();
-      toggleIsFocused();
-    }
-  }, [isGameReset]);
-
+    return () => {
+      reset();
+    };
+  }, []);
+  
   useEffect(() => {
     if (!isGameOver) return;
-
     setResult(elapsed.current, valuePerSecond.current, matter);
     showResult();
   }, [isGameOver]);
 
+  // this is done don't touch it
   useEffect(() => {
-    if (!isTypingStarted) return;
+    if (!(isTypingStarted && isFocused)) return;
 
     const timer = setInterval(() => {
       valuePerSecond.current.push(value.current);
@@ -154,24 +169,7 @@ const TypingInput = () => {
   }, [cases, mode, number, punctuation, session, wordCount]);
 
   useEffect(() => {
-    // reset the values
-    if (inputRef.current) inputRef.current.value = "";
-    if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
-    valuePerSecond.current = [];
-    lastCorrectIndex.current = 0;
-    timer.current = undefined;
-    value.current = "";
-    elapsed.current = 0;
-
-    // replace the caret to the start
-    if (charRefs.current[0]) {
-      const { x, y } = getOffsets(charRefs.current[0]);
-      yCoordFirstLine.current = y;
-      if (caretRef.current) placeCaret(caretRef.current, { x, y });
-    }
-    charRefs.current?.forEach((span) => {
-      if (span) resetStyle(span);
-    });
+    resetComponent();
   }, [matter]);
   return (
     <div className="flex flex-col justify-between">
