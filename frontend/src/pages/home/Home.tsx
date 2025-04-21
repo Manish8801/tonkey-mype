@@ -1,5 +1,5 @@
 import useGameStore from "../../zustand/useGameStore";
-import Result from "./components/Result";
+import Result from "../../components/result/Result";
 import TypingInput from "./components/TypingInput";
 import "./Home.css";
 

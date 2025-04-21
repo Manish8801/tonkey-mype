@@ -5,16 +5,17 @@ import { IoEarth } from "react-icons/io5";
 import { Link,  useNavigate } from "react-router-dom";
 import useAuthStore from "../../../zustand/useAuthStore";
 
-const ProfileIconButtonOptions = () => {
+const AccountButtonOptions = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
+  
   const handleLogoutButton = async () => {
     logout();
     navigate("/login");
   };
 
   return (
-    <ul className="absolute bg-sub-alt-color overflow-hidden bottom-0 right-0 translate-y-full group-hover:flex hidden border-base-primary rounded-xl border-6 flex-col items-stretch text-xs font-roboto">
+    <ul className="absolute bg-sub-alt-color overflow-hidden bottom-0 translate-y-full right-0 group-hover:flex hidden border-base-primary rounded-xl border-6 flex-col items-stretch text-xs font-roboto">
       <li>
         <button className="w-full flex text-nowrap justify-start items-center gap-2 py-1.5 px-2.5 text-content-primary hover:bg-content-primary active:bg-content-secondary hover:text-base-secondary ease-linear">
           <GiProgression className="text-sm" />
@@ -47,4 +48,4 @@ const ProfileIconButtonOptions = () => {
   );
 };
 
-export default ProfileIconButtonOptions;
+export default AccountButtonOptions;

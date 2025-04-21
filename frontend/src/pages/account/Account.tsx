@@ -1,7 +1,7 @@
 import { Line } from "rc-progress";
 import useAuthStore from "../../zustand/useAuthStore";
 
-const Profile = () => {
+const Account = () => {
   const { user } = useAuthStore();
 
   return (
@@ -72,4 +72,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Account;

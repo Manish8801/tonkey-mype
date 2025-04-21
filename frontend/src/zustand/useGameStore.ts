@@ -3,6 +3,7 @@ import { genMatter, getResult } from "../utils/game.utils";
 import type { IGenConfigs, IResult } from "../types/type";
 
 type TStore = {
+  isGameStarted: boolean;
   actual: string;
   cases: boolean;
   errors: { [key: string]: number };
@@ -17,7 +18,15 @@ type TStore = {
   resultShown: boolean;
   session: number;
   wordCount: number;
-  setResult: (timeInSec: number, valuePerSecond: string[]) => void;
+  isGameReset: boolean;
+  toggleIsGameReset: () => void;
+  startGame: () => void;
+  hideResult: () => void;
+  setResult: (
+    timeInSec?: number,
+    valuePerSecond?: string[],
+    matter?: string
+  ) => void;
   toggleIsTypingStarted: () => void;
   setErrors: (errors: { [key: string]: number }) => void;
   setActual: (actual: string) => void;
@@ -35,6 +44,8 @@ type TStore = {
 };
 
 const useGameStore = create<TStore>()((set, get) => ({
+  isGameReset: false,
+  isGameStarted: true,
   errors: {},
   isTypingStarted: false,
   actual: "",
@@ -50,6 +61,9 @@ const useGameStore = create<TStore>()((set, get) => ({
   isGameOver: false,
   resultShown: false,
   graphData: null,
+  toggleIsGameReset: () => set({ isGameReset: !get().isGameStarted }),
+  startGame: () =>
+    set({ resultShown: false, isGameOver: false, isGameStarted: true }),
   genMatter: () => {
     const { number, punctuation, cases, mode, session, wordCount } = get();
     const configs: IGenConfigs = { number, punctuation, cases };
@@ -59,15 +73,19 @@ const useGameStore = create<TStore>()((set, get) => ({
     const matter = genMatter(configs);
     set({ matter });
   },
+  hideResult: () => set({ resultShown: false }),
   overGame: () => set({ isGameOver: true }),
   restartGame: () => set({ isGameOver: false }),
   setActual: (actual) => set({ actual }),
   setErrors: (errors) => set({ errors }),
   setMode: (mode) => set({ mode }),
-  setResult: (timeInSec, valuePerSecond) => {
-    const { matter } = get();
-    const result = getResult(timeInSec, valuePerSecond, matter);
-    set({ result });
+  setResult: (timeInSec, valuePerSecond, matter) => {
+    if (!(timeInSec && valuePerSecond && matter)) set({ result: null });
+    else {
+      const { matter } = get();
+      const result = getResult(timeInSec, valuePerSecond, matter);
+      set({ result });
+    }
   },
   setSession: (session) => set({ session }),
   setWordCount: (wordCount) => set({ wordCount }),

@@ -12,14 +12,14 @@ const App = () => {
   }, []);
 
   return (
-      <div className="bg-base-primary">
-        <Dialogs />
-        <div className="min-h-screen flex gap-10 flex-col justify-between mx-auto sm:w-[640px] md:w-3xl lg:w-5xl xl:w-7xl p-4 pt-8 ">
-          <Header />
-          <Outlet />
-          <Footer />
-        </div>
+    <div id="main-container" className="bg-base-primary">
+      <Dialogs />
+      <div className="min-h-screen flex gap-10 flex-col justify-between mx-auto sm:w-[640px] md:w-3xl lg:w-5xl xl:w-7xl p-4 pt-8 ">
+        <Header />
+        <Outlet />
+        <Footer />
       </div>
+    </div>
   );
 };
 

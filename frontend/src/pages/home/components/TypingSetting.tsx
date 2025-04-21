@@ -1,9 +1,11 @@
 import useGameStore from "../../../zustand/useGameStore";
-import { useEffect } from "react";
 import useDialogStore from "../../../zustand/useDialogStore";
 import { IoSettingsSharp } from "react-icons/io5";
 import { FaAt } from "react-icons/fa6";
 import { FaClock, FaFont, FaHashtag, FaTools } from "react-icons/fa";
+import { TbLetterCase } from "react-icons/tb";
+
+import Button from "./Button";
 
 const TypingSetting = () => {
   const {
@@ -14,7 +16,6 @@ const TypingSetting = () => {
     session,
     wordCount,
     toggleCases,
-    genMatter,
     setSession,
     setWordCount,
     setMode,
@@ -27,13 +28,11 @@ const TypingSetting = () => {
     toggleTypingSettingDialog,
     toggleWordCountDialog,
   } = useDialogStore();
-  
-  useEffect(() => {
-    genMatter();
-  }, [number, punctuation, cases, mode, session, wordCount, genMatter]);
+
+
 
   return (
-    <div className="bg-[rgba(0,0,0,.13)] text-config flex items-center justify-center mx-auto w-fit rounded-lg text-content-secondary overflow-hidden leading-4">
+    <div className="bg-sub-alt-color text-config flex items-center justify-center mx-auto w-fit rounded-[7px] text-content-secondary overflow-hidden leading-4">
       {/* small screen */}
       <button
         onClick={() => toggleTypingSettingDialog()}
@@ -46,132 +45,93 @@ const TypingSetting = () => {
       </button>
 
       {/* medium screen */}
-      <div className="hidden sm:flex max-w-full sm:text-[0.7rem] md:text-[0.75rem] lg:text-[0.8rem] items-center justify-between sm:gap-1.5 md:gap-2 lg:gap-2.5 px-4">
-        <button
-          className={`${
-            punctuation ? "text-content-main" : "hover:text-content-primary"
-          } gap-0.5 py-2.5 flex  justify-center hover:text-content-primary duration-200 ease-out`}
+      <div className="hidden sm:flex max-w-full sm:text-[0.7rem] md:text-[0.75rem] lg:text-[0.8rem] items-center justify-between sm:gap-3.5 md:gap-4.5 lg:gap-6 px-7">
+        <Button
+          Icon={FaAt}
+          isActive={punctuation}
+          text="punctuation"
           onClick={() => togglePunctuation()}
-        >
-          <FaAt className="sm:text-sm md:text-base" />
-          <div className="font-semibold pb-1">punctuation</div>
-        </button>
-        <button
-          className={`${
-            number ? "text-content-main" : "hover:text-content-primary"
-          } gap-0.5 py-2.5 flex  justify-center hover:text-content-primary duration-200 ease-out`}
-          onClick={() => toggleNumber()}
-        >
-          <FaHashtag className="sm:text-sm md:text-base" />
-          <div className="font-semibold pb-1">numbers</div>
-        </button>
-        <button
-          className={`${
-            cases ? "text-content-main" : "hover:text-content-primary"
-          } gap-1 py-2.5 flex justify-center items-center hover:text-content-primary duration-200 ease-out`}
-          onClick={() => toggleCases()}
-        >
-          <span className="relative z-auto top-[.5px] sm:text-xs md:text-sm font-semibold">
-            Aa
-          </span>
-          <span className="font-semibold">Cases</span>
-        </button>
-        <div
-          className="h-7 rounded-full sm:w-[2px] md:w-[3px] lg:w-[4px] bg-base-primary"
-          aria-hidden={true}
         />
-        <button
-          className={`py-2.5 flex items-center justify-center gap-0.5 ${
-            mode === "session"
-              ? "text-content-main"
-              : "hover:text-content-primary"
-          } duration-200 ease-out`}
-          onClick={() => setMode("session")}
-        >
-          <FaClock className="sm:text-sm md:text-base" />
-          <div className="font-semibold">time</div>
-        </button>
-        <button
-          className={`py-2.5 flex items-center justify-center gap-0.5 ${
-            mode === "words"
-              ? "text-content-main"
-              : "hover:text-content-primary"
-          } duration-200 ease-out`}
-          onClick={() => setMode("words")}
-        >
-          <FaFont className="sm:text-sm md:text-base" />
-          <div className="font-semibold">words</div>
-        </button>
+        <Button
+          Icon={FaHashtag}
+          isActive={number}
+          text="numbers"
+          onClick={() => toggleNumber()}
+        />
+        <Button
+          Icon={TbLetterCase}
+          isActive={cases}
+          text="cases"
+          onClick={() => toggleCases()}
+        />
 
         <div
-          className="h-7 rounded-full sm:w-[2px] md:w-[3px] lg:w-[4px] bg-base-primary"
+          className="h-7 rounded-full sm:w-[3px] md:w-[4px] lg:w-[5px] bg-base-primary"
           aria-hidden={true}
         />
-        <button
-          className={`${
-            (mode === "session" && session === 15) ||
-            (mode === "words" && wordCount === 10)
-              ? "text-content-main"
-              : "hover:text-content-primary duration-200"
-          }  ease-out font-semibold`}
+
+        <Button
+          Icon={FaClock}
+          isActive={mode === "session"}
+          text="time"
+          onClick={() => setMode("session")}
+        />
+
+        <Button
+          Icon={FaFont}
+          isActive={mode === "words"}
+          text="words"
+          onClick={() => setMode("words")}
+        />
+
+        <div
+          className="h-7 rounded-full sm:w-[3px] md:w-[4px] lg:w-[5px] bg-base-primary"
+          aria-hidden={true}
+        />
+
+        <Button
+          isActive={mode === "session" ? session === 15 : wordCount === 10}
+          text={mode === "session" ? "15" : "10"}
           onClick={() => {
             if (mode === "session") setSession(15);
             else setWordCount(10);
           }}
-        >
-          {mode === "session" ? 15 : 10}
-        </button>
-        <button
-          className={`${
-            (mode === "session" && session === 30) ||
-            (mode === "words" && wordCount === 20)
-              ? "text-content-main"
-              : "hover:text-content-primary duration-200"
-          }  ease-out font-semibold`}
+        />
+        <Button
+          isActive={mode === "session" ? session === 30 : wordCount === 20}
+          text={mode === "session" ? "30" : "20"}
           onClick={() => {
             if (mode === "session") setSession(30);
-            setWordCount(20);
+            else setWordCount(20);
           }}
-        >
-          {mode === "session" ? 30 : 20}
-        </button>
-        <button
-          className={`${
-            (mode === "session" && session === 60) ||
-            (mode === "words" && wordCount === 50)
-              ? "text-content-main"
-              : "hover:text-content-primary duration-200"
-          } ease-out font-semibold`}
+        />
+        <Button
+          isActive={mode === "session" ? session === 60 : wordCount === 50}
+          text={mode === "session" ? "45" : "30"}
           onClick={() => {
             if (mode === "session") setSession(60);
-            setWordCount(50);
+            else setWordCount(50);
           }}
-        >
-          {mode === "session" ? 60 : 50}
-        </button>
-        <button
-          className={`${
-            (mode === "session" && session === 120) ||
-            (mode === "words" && wordCount === 100)
-              ? "text-content-main"
-              : "hover:text-content-primary duration-200"
-          } ease-out font-semibold`}
+        />
+
+        <Button
+          isActive={mode === "session" ? session === 120 : wordCount === 100}
+          text={mode === "session" ? "120" : "100"}
           onClick={() => {
             if (mode === "session") setSession(120);
-            setWordCount(100);
+            else setWordCount(100);
           }}
-        >
-          {mode === "session" ? 120 : 100}
-        </button>
-        <button
-          className="sm:text-sm md:text-base hover:text-content-primary duration-200 ease-out"
+        />
+
+        <Button
+          Icon={FaTools}
+          isActive={false}
+          text=""
           onClick={() => {
             if (mode === "session") toggleDurationDialog();
-            if (mode === "words") toggleWordCountDialog();
+            else toggleWordCountDialog();
           }}
-        >
-          <FaTools />
-        </button>
+        />
       </div>
     </div>
   );

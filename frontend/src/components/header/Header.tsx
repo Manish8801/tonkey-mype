@@ -1,12 +1,13 @@
-import { FaSignOutAlt } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
-import { IoEarth } from "react-icons/io5";
-import { GiProgression } from "react-icons/gi";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useAuthStore from "../../zustand/useAuthStore";
 import { FaBell, FaCrown, FaKeyboard } from "react-icons/fa6";
 import { IoPersonSharp, IoSettingsSharp } from "react-icons/io5";
-import ProfileIconButtonOptions from "./components/ProfileIconButtonOptions";
+import AccountButtonOptions from "./components/AccountButtonOptions";
+
+import { FaInfo } from "react-icons/fa";
+import IconButton from "./../globals/IconButton";
+import NavLinkButton from "./components/NavLinkButton";
+import Tooltip from "./components/Tooltip";
 
 const Header = () => {
   const { isLoggedIn, user } = useAuthStore();
@@ -26,46 +27,48 @@ const Header = () => {
         </h1>
       </Link>
 
-      <div className="flex-1 flex gap-0.5 justify-between text-content-secondary">
-        <div className="flex items-center ">
-          <FaKeyboard className="box-content p-2 cursor-pointer ease-out duration-200 hover:text-content-primary text-xl" />
-          <Link
-            to="/leaderboard"
-            className="p-3 ease-out duration-200 hover:text-content-primary text-xl"
+      <nav className="flex-1 flex gap-0.5 justify-between text-content-secondary">
+        <div className="flex items-center gap-1.5">
+          <IconButton
+            onClick={() => {
+              console.log("Keyboard key pressed");
+            }}
           >
+            <FaKeyboard />
+            <Tooltip title="start test" />
+          </IconButton>
+
+          <NavLinkButton to="/leaderboards">
             <FaCrown />
-          </Link>
-          <Link
-            to="/about"
-            className="p-2 ease-out duration-200 hover:text-content-primary font-lexend font-extrabold leading-5 text-xl"
-          >
-            i
-          </Link>
-          <Link
-            to="/settings"
-            className="p-2 ease-out duration-200 hover:text-content-primary text-xl"
-          >
+            <Tooltip title="leaderboards" />
+          </NavLinkButton>
+
+          <NavLinkButton to="/about">
+            <FaInfo />
+            <Tooltip title="about" />
+          </NavLinkButton>
+
+          <NavLinkButton to="/settings">
             <IoSettingsSharp />
-          </Link>
+            <Tooltip title="settings" />
+          </NavLinkButton>
         </div>
-        <div className="flex gap-0.5 items-center">
-          <button className="p-2 cursor-pointer ease-out duration-200 hover:text-content-primary text-xl">
+        <div className="flex gap-1.5 items-center">
+          <IconButton onClick={() => console.log("navigate notifications")}>
             <FaBell />
-          </button>
+          </IconButton>
+
           <div className="group relative">
-            <Link
-              to={user ? "/profile" : "/login"}
-              className="p-2 relative flex gap-1 ease-out duration-200 hover:text-content-primary text-xl"
-            >
+            <NavLinkButton to={isLoggedIn ? "/account" : "/login"}>
               <IoPersonSharp />
               {isLoggedIn && (
-                <span className="font-roboto text-xs">{user?.username}</span>
+                <span className="font-roboto text-xs">{user?.fullName}</span>
               )}
-            </Link>
-            <ProfileIconButtonOptions />
+            </NavLinkButton>
+            {isLoggedIn && <AccountButtonOptions />}
           </div>
         </div>
-      </div>
+      </nav>
     </header>
   );
 };

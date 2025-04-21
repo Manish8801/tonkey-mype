@@ -15,6 +15,7 @@ import TypingSetting from "./TypingSetting";
 
 const TypingInput = () => {
   const {
+    isGameReset,
     isTypingStarted,
     matter,
     isFocused,
@@ -24,6 +25,8 @@ const TypingInput = () => {
     punctuation,
     cases,
     mode,
+    isGameOver,
+    overGame,
     setResult,
     showResult,
     genMatter,
@@ -37,12 +40,13 @@ const TypingInput = () => {
   const lastCorrectIndex = useRef<number>(0);
   const value = useRef<string>("");
   const yCoordFirstLine = useRef<number>(0);
-  const startTime = useRef<number>(0);
   const valuePerSecond = useRef<string[]>([]);
   const timer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const elapsed = useRef<number>(0);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const valueLength = e.target.value.length;
+    if (valueLength === matter.length) overGame();
     // if value length is greater than or equal length of matter
     if (valueLength >= matter.length + 1) {
       e.preventDefault();
@@ -50,8 +54,10 @@ const TypingInput = () => {
       return;
     }
 
-    if (startTime.current === 0) {
-      startTime.current = Math.round(performance.now());
+    if (
+      !isTypingStarted &&
+      (e.target.value.length > 0 || valuePerSecond.current.length > 0)
+    ) {
       toggleIsTypingStarted();
     }
 
@@ -110,22 +116,32 @@ const TypingInput = () => {
   };
 
   useEffect(() => {
-    let elapsed = 0;
-    if (isTypingStarted) {
-      timer.current = setInterval(() => {
-        const isGameOver =
-          (mode === "session" && elapsed === session) ||
-          (mode === "words" && value.current.length === matter.length);
-        if (isGameOver) {
-          clearInterval(timer.current);
-          setResult(elapsed, valuePerSecond.current);
-          showResult();
-        }
-        if (isFocused) elapsed++;
-        valuePerSecond.current.push(value.current);
-      }, 1000);
+    if (isGameReset) {
+      toggleIsTypingStarted();
+      toggleIsFocused();
     }
-  }, [isTypingStarted, isFocused, session, mode]);
+  }, [isGameReset]);
+
+  useEffect(() => {
+    if (!isGameOver) return;
+
+    setResult(elapsed.current, valuePerSecond.current, matter);
+    showResult();
+  }, [isGameOver]);
+
+  useEffect(() => {
+    if (!isTypingStarted) return;
+
+    const timer = setInterval(() => {
+      valuePerSecond.current.push(value.current);
+      elapsed.current++;
+      if (mode === "session" && elapsed.current === session) overGame();
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isTypingStarted, isFocused]);
 
   // don't touch it
   useEffect(() => {
@@ -143,9 +159,9 @@ const TypingInput = () => {
     if (paragraphRef.current) paragraphRef.current.scrollTo(0, 0);
     valuePerSecond.current = [];
     lastCorrectIndex.current = 0;
-    startTime.current = 0;
     timer.current = undefined;
     value.current = "";
+    elapsed.current = 0;
 
     // replace the caret to the start
     if (charRefs.current[0]) {
@@ -172,7 +188,7 @@ const TypingInput = () => {
           onFocus={() => toggleIsFocused()}
         >
           <div
-            className={`px-2 relative h-[145px] overflow-y-hidden ${
+            className={`px-2 relative h-[145px] overflow-hidden ${
               !isFocused ? "blur-[10px]" : ""
             } ] text-left select-none scroll-smooth`}
             ref={paragraphRef}
